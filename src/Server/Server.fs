@@ -1,43 +1,56 @@
 module Server
 
-open Fable.Remoting.Server
-open Fable.Remoting.Giraffe
+open FSharp.Control.Tasks.V2
 open Saturn
-
+open Giraffe
+open Microsoft.Extensions.Logging
 open Shared
 
-type Storage () =
-    let todos = ResizeArray<_>()
+module Channel = 
+    open Thoth.Json.Net
 
-    member __.GetTodos () =
-        List.ofSeq todos
+    /// Sends a message to a specific client by their socket ID.
+    let sendMessage (hub : Channels.ISocketHub) socketId (payload : WebSocketServerMessage) = task {
+        let payload = Encode.Auto.toString(0, payload)
+        do! hub.SendMessageToClient "/channel" socketId "" payload
+    }
 
-    member __.AddTodo (todo: Todo) =
-        if Todo.isValid todo.Description then
-            todos.Add todo
-            Ok ()
-        else Error "Invalid todo"
+    /// Sends a message to all connected clients.
+    let broadcastMessage (hub:Channels.ISocketHub) (payload:WebSocketServerMessage) = task {
+        let payload = Encode.Auto.toString(0, payload)
+        do! hub.SendMessageToClients "/channel" "" payload
+    }
 
-let storage = Storage()
+    /// Sets up the channel to listen to clients.
+    let channel = channel {
+        join (fun ctx socketId ->
+            task {
+                ctx.GetLogger().LogInformation("Client has connected. They've been assigned socket Id: {socketId}", socketId)
+                return Channels.Ok
+            })
+        handle "" (fun ctx clientInfo message ->
+            task {
+                let hub = ctx.GetService<Channels.ISocketHub>()
+                let message = message.Payload |> string |> Decode.Auto.unsafeFromString<WebSocketClientMessage>
 
-storage.AddTodo(Todo.create "Create new SAFE project") |> ignore
-storage.AddTodo(Todo.create "Write your app") |> ignore
-storage.AddTodo(Todo.create "Ship it !!!") |> ignore
+                // Here we handle any websocket client messages in a type-safe manner
+                match message with
+                | TextMessage message ->
+                    let message = sprintf "Websocket message: %s" message
+                    do! broadcastMessage hub (BroadcastMessage { Time = System.DateTime.UtcNow; Message = message })
+            })
+    }
 
-let todosApi =
-    { getTodos = fun () -> async { return storage.GetTodos() }
-      addTodo =
-        fun todo -> async {
-            match storage.AddTodo todo with
-            | Ok () -> return todo
-            | Error e -> return failwith e
-        } }
-
-let webApp =
-    Remoting.createApi()
-    |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.fromValue todosApi
-    |> Remoting.buildHttpHandler
+let webApp = router {
+    post "/api/broadcast" (fun next ctx ->
+        task {
+            let! message = ctx.BindModelAsync()
+            let hub = ctx.GetService<Channels.ISocketHub>()
+            let message = sprintf "HTTP message: %O" message
+            do! Channel.broadcastMessage hub (BroadcastMessage { Time = System.DateTime.UtcNow; Message = message })
+            return! next ctx
+        })
+}
 
 let app =
     application {
@@ -45,7 +58,9 @@ let app =
         use_router webApp
         memory_cache
         use_static "public"
+        use_json_serializer(Thoth.Json.Giraffe.ThothSerializer())
         use_gzip
+        add_channel "/channel" Channel.channel
     }
 
 run app

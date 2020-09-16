@@ -1,115 +1,179 @@
 module Index
 
 open Elmish
-open Fable.Remoting.Client
+open Fable.React
+open Thoth.Json
+open Thoth.Fetch
+open Fulma
+open Browser.Types
 open Shared
+open System
+
+/// Status of the websocket.
+type WsSender = WebSocketClientMessage -> unit
+type BroadcastMode = ViaWebSocket | ViaHTTP
+type ConnectionState =
+    | DisconnectedFromServer | ConnectedToServer of WsSender | Connecting
+    member this.IsConnected =
+        match this with
+        | ConnectedToServer _ -> true
+        | DisconnectedFromServer | Connecting -> false
 
 type Model =
-    { Todos: Todo list
-      Input: string }
+    { MessageToSend : string
+      ReceivedMessages : Message list
+      ConnectionState : ConnectionState }
 
 type Msg =
-    | GotTodos of Todo list
-    | SetInput of string
-    | AddTodo
-    | AddedTodo of Todo
+    | ReceivedFromServer of WebSocketServerMessage
+    | ConnectionChange of ConnectionState
+    | MessageChanged of string
+    | Broadcast of BroadcastMode * string
 
-let todosApi =
-    Remoting.createApi()
-    |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.buildProxy<ITodosApi>
+module Channel = 
+    open Browser.WebSocket
 
-let init(): Model * Cmd<Msg> =
-    let model =
-        { Todos = []
-          Input = "" }
-    let cmd = Cmd.OfAsync.perform todosApi.getTodos () GotTodos
-    model, cmd
+    let inline decode<'a> x = x |> unbox<string> |> Thoth.Json.Decode.Auto.unsafeFromString<'a>
+    let buildWsSender (ws:WebSocket) : WsSender =
+        fun (message:WebSocketClientMessage) ->
+            let message = {| Topic = ""; Ref = ""; Payload = message |}
+            let message = Thoth.Json.Encode.Auto.toString(0, message)
+            ws.send message
 
-let update (msg: Msg) (model: Model): Model * Cmd<Msg> =
+    let subscription _ =
+        let sub dispatch =
+            /// Handles push messages from the server and relays them into Elmish messages.
+            let onWebSocketMessage (msg:MessageEvent) =
+                let msg = msg.data |> decode<{| Payload : string |}>
+                msg.Payload
+                |> decode<WebSocketServerMessage>
+                |> ReceivedFromServer
+                |> dispatch
+
+            /// Continually tries to connect to the server websocket.
+            let rec connect () =
+                let ws = WebSocket.Create "ws://localhost:8085/channel"
+                ws.onmessage <- onWebSocketMessage
+                ws.onopen <- (fun ev ->
+                    dispatch (ConnectionChange (ConnectedToServer (buildWsSender ws)))
+                    printfn "WebSocket opened")
+                ws.onclose <- (fun ev ->
+                    dispatch (ConnectionChange DisconnectedFromServer)
+                    printfn "WebSocket closed. Retrying connection"
+                    promise {
+                        do! Promise.sleep 2000
+                        dispatch (ConnectionChange Connecting)
+                        connect() })
+
+            connect()
+
+        Cmd.ofSub sub
+
+let init () =
+    { MessageToSend = null
+      ConnectionState = DisconnectedFromServer
+      ReceivedMessages = [] }, Cmd.none
+
+let update msg model : Model * Cmd<Msg> =
     match msg with
-    | GotTodos todos ->
-        { model with Todos = todos }, Cmd.none
-    | SetInput value ->
-        { model with Input = value }, Cmd.none
-    | AddTodo ->
-        let todo = Todo.create model.Input
-        let cmd = Cmd.OfAsync.perform todosApi.addTodo todo AddedTodo
-        { model with Input = "" }, cmd
-    | AddedTodo todo ->
-        { model with Todos = model.Todos @ [ todo ] }, Cmd.none
+    | MessageChanged msg ->
+        { model with MessageToSend = msg }, Cmd.none
+    | ConnectionChange status ->
+        { model with ConnectionState = status }, Cmd.none
+    | ReceivedFromServer (BroadcastMessage message) ->
+        { model with ReceivedMessages = message :: model.ReceivedMessages }, Cmd.none
+    | Broadcast (ViaWebSocket, msg) ->
+        match model.ConnectionState with
+        | ConnectedToServer sender -> sender (TextMessage msg)
+        | _ -> ()
+        model, Cmd.none
+    | Broadcast (ViaHTTP, msg) ->
+        let post = Fetch.post("/api/broadcast", msg)
+        model, Cmd.OfPromise.result post
 
-open Fable.React
-open Fable.React.Props
-open Fulma
-
-let navBrand =
-    Navbar.Brand.div [ ] [
-        Navbar.Item.a [
-            Navbar.Item.Props [ Href "https://safe-stack.github.io/" ]
-            Navbar.Item.IsActive true
+module ViewParts =
+    let drawStatus connectionState =
+        Tag.tag [
+            Tag.Color
+                (match connectionState with
+                 | DisconnectedFromServer -> Color.IsDanger
+                 | Connecting -> Color.IsWarning
+                 | ConnectedToServer _ -> Color.IsSuccess)
         ] [
-            img [
-                Src "/favicon.png"
-                Alt "Logo"
-            ]
+            match connectionState with
+            | DisconnectedFromServer -> str "Disconnected from server"
+            | Connecting -> str "Connecting..."
+            | ConnectedToServer _ -> str "Connected to server"
         ]
-    ]
-
-let containerBox (model : Model) (dispatch : Msg -> unit) =
-    Box.box' [ ] [
-        Content.content [ ] [
-            Content.Ol.ol [ ] [
-                for todo in model.Todos do
-                    li [ ] [ str todo.Description ]
-            ]
-        ]
-        Field.div [ Field.IsGrouped ] [
-            Control.p [ Control.IsExpanded ] [
-                Input.text [
-                  Input.Value model.Input
-                  Input.Placeholder "What needs to be done?"
-                  Input.OnChange (fun x -> SetInput x.Value |> dispatch) ]
-            ]
-            Control.p [ ] [
-                Button.a [
-                    Button.Color IsPrimary
-                    Button.Disabled (Todo.isValid model.Input |> not)
-                    Button.OnClick (fun _ -> dispatch AddTodo)
-                ] [
-                    str "Add"
-                ]
-            ]
-        ]
-    ]
 
 let view (model : Model) (dispatch : Msg -> unit) =
-    Hero.hero [
-        Hero.Color IsPrimary
-        Hero.IsFullHeight
-        Hero.Props [
-            Style [
-                Background """linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://unsplash.it/1200/900?random") no-repeat center center fixed"""
-                BackgroundSize "cover"
+    div [] [
+        Navbar.navbar [ Navbar.Color IsPrimary ] [
+            Navbar.Item.div [ ] [
+                Heading.h2 [ ] [ str "SAFE Channels Template" ]
             ]
         ]
-    ] [
-        Hero.head [ ] [
-            Navbar.navbar [ ] [
-                Container.container [ ] [ navBrand ]
+        Container.container [] [
+            Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ] [
+                Heading.h3 [] [ str "Send a message!" ]
+                Input.text [ Input.OnChange(fun e -> dispatch(MessageChanged e.Value)) ]
             ]
-        ]
+            Columns.columns [] [
+                for broadcastMethod in [ ViaHTTP; ViaWebSocket ] do
+                    Column.column [] [
+                        Button.button
+                            [ Button.IsFullWidth
+                              Button.Color IsPrimary
+                              Button.Disabled (String.IsNullOrEmpty model.MessageToSend || not model.ConnectionState.IsConnected)
+                              Button.OnClick (fun _ -> dispatch (Broadcast (broadcastMethod, model.MessageToSend))) ]
+                            [ str (sprintf "Click to broadcast %O!" broadcastMethod) ]
+                    ]
+            ]
 
-        Hero.body [ ] [
-            Container.container [ ] [
-                Column.column [
-                    Column.Width (Screen.All, Column.Is6)
-                    Column.Offset (Screen.All, Column.Is3)
-                ] [
-                    Heading.p [ Heading.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ] [ str "scrum_poker" ]
-                    containerBox model dispatch
+            ViewParts.drawStatus model.ConnectionState
+
+            match model.ReceivedMessages with
+            | [] ->
+                ()
+            | messages ->
+                Table.table [] [
+                    thead [] [
+                        tr [] [
+                            td [] [ str "Time" ]
+                            td [] [ str "Message" ]
+                        ]
+                    ]
+                    tbody [][
+                        for message in messages do
+                            tr [] [
+                                td [] [ str (sprintf "%O" message.Time) ]
+                                td [] [ str message.Message ]
+                            ]
+                    ]
+                    tfoot [] []
                 ]
+        ]
+        Footer.footer [ ] [
+            Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ] [
+                str "Demo by Compositional IT"
             ]
         ]
     ]
 
+module CustomEncoders =
+
+    let inline addDummyCoder<'b> extrasIn =
+        let typeName = string typeof<'b>
+        let simpleEncoder(_ : 'b) = Encode.string (sprintf "%s function" typeName)
+        let simpleDecoder = Decode.fail (sprintf "Decoding is not supported for %s type" typeName)
+        extrasIn |> Extra.withCustom simpleEncoder simpleDecoder
+        
+    let inline buildExtras<'a> extraCoders =
+        let myEncoder:Encoder<'a> = Encode.Auto.generateEncoder(extra = extraCoders)
+        let myDecoder:Decoder<'a> = Decode.Auto.generateDecoder(extra = extraCoders)
+        (myEncoder, myDecoder)
+
+let extras : Encoder<Model> * (string -> obj -> Result<Model,DecoderError>) = 
+    Extra.empty
+    |> CustomEncoders.addDummyCoder<WsSender>
+    |> CustomEncoders.buildExtras<Model>

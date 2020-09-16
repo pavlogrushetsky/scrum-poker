@@ -2,22 +2,12 @@ namespace Shared
 
 open System
 
-type Todo =
-    { Id : Guid
-      Description : string }
+type Message =
+    { Time : DateTime
+      Message : string }
 
-module Todo =
-    let isValid (description: string) =
-        String.IsNullOrWhiteSpace description |> not
+type WebSocketServerMessage =
+    | BroadcastMessage of Message
 
-    let create (description: string) =
-        { Id = Guid.NewGuid()
-          Description = description }
-
-module Route =
-    let builder typeName methodName =
-        sprintf "/api/%s/%s" typeName methodName
-
-type ITodosApi =
-    { getTodos : unit -> Async<Todo list>
-      addTodo : Todo -> Async<Todo> }
+type WebSocketClientMessage =
+    | TextMessage of string
