@@ -5,9 +5,29 @@ open Saturn
 open Giraffe
 open Microsoft.Extensions.Logging
 open Shared
+open System
+
+module Database =
+    open LiteDB
+    open LiteDB.FSharp
+
+    type Storage () = 
+        let database = 
+            let mapper = FSharpBsonMapper()
+            let connStr = "Filename=Messages.db;mode=Exclusive"
+            new LiteDatabase (connStr, mapper)
+        let messages = database.GetCollection<Message> "messages"
+
+        member _.GetMessages () = 
+            messages.FindAll () |> List.ofSeq
+
+        member _.AddMessage (message : Message) =
+            messages.Insert message |> ignore
+            Ok ()
 
 module Channel = 
     open Thoth.Json.Net
+    open Database
 
     /// Sends a message to a specific client by their socket ID.
     let sendMessage (hub : Channels.ISocketHub) socketId (payload : WebSocketServerMessage) = task {
@@ -22,7 +42,7 @@ module Channel =
     }
 
     /// Sets up the channel to listen to clients.
-    let channel = channel {
+    let channel (db : Storage) = channel {
         join (fun ctx socketId ->
             task {
                 ctx.GetLogger().LogInformation("Client has connected. They've been assigned socket Id: {socketId}", socketId)
@@ -36,8 +56,10 @@ module Channel =
                 // Here we handle any websocket client messages in a type-safe manner
                 match message with
                 | TextMessage message ->
-                    let message = sprintf "Websocket message: %s" message
-                    do! broadcastMessage hub (BroadcastMessage { Time = System.DateTime.UtcNow; Message = message })
+                    let text = sprintf "Websocket message: %s" message
+                    let message = { Id = Guid.NewGuid(); Time = System.DateTime.UtcNow; Text = text }
+                    db.AddMessage (message) |> ignore
+                    do! broadcastMessage hub (BroadcastMessage message)
             })
     }
 
@@ -47,12 +69,13 @@ let webApp = router {
             let! message = ctx.BindModelAsync()
             let hub = ctx.GetService<Channels.ISocketHub>()
             let message = sprintf "HTTP message: %O" message
-            do! Channel.broadcastMessage hub (BroadcastMessage { Time = System.DateTime.UtcNow; Message = message })
+            do! Channel.broadcastMessage hub (BroadcastMessage { Id = Guid.NewGuid(); Time = System.DateTime.UtcNow; Text = message })
             return! next ctx
         })
 }
 
 let app =
+    let db = Database.Storage ()
     application {
         url "http://0.0.0.0:8085"
         use_router webApp
@@ -60,7 +83,7 @@ let app =
         use_static "public"
         use_json_serializer(Thoth.Json.Giraffe.ThothSerializer())
         use_gzip
-        add_channel "/channel" Channel.channel
+        add_channel "/channel" (Channel.channel db)
     }
 
 run app

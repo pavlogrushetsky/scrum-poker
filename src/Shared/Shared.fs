@@ -2,9 +2,11 @@ namespace Shared
 
 open System
 
+[<CLIMutable>]
 type Message =
-    { Time : DateTime
-      Message : string }
+    { Id : Guid
+      Time : DateTime
+      Text : string }
 
 type WebSocketServerMessage =
     | BroadcastMessage of Message

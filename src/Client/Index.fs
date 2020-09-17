@@ -147,7 +147,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
                         for message in messages do
                             tr [] [
                                 td [] [ str (sprintf "%O" message.Time) ]
-                                td [] [ str message.Message ]
+                                td [] [ str message.Text ]
                             ]
                     ]
                     tfoot [] []
