@@ -19,7 +19,9 @@ module Database =
         let messages = database.GetCollection<Message> "messages"
 
         member _.GetMessages () = 
-            messages.FindAll () |> List.ofSeq
+            messages.FindAll () 
+            |> List.ofSeq 
+            |> List.sortByDescending (fun m -> m.Time)
 
         member _.AddMessage (message : Message) =
             messages.Insert message |> ignore
@@ -43,9 +45,9 @@ module Channel =
 
     /// Sets up the channel to listen to clients.
     let channel (db : Storage) = channel {
-        join (fun ctx socketId ->
+        join (fun ctx clientInfo ->
             task {
-                ctx.GetLogger().LogInformation("Client has connected. They've been assigned socket Id: {socketId}", socketId)
+                ctx.GetLogger().LogInformation("Client has connected. They've been assigned socket Id: {socketId}", clientInfo.SocketId)                
                 return Channels.Ok
             })
         handle "" (fun ctx clientInfo message ->
@@ -53,13 +55,15 @@ module Channel =
                 let hub = ctx.GetService<Channels.ISocketHub>()
                 let message = message.Payload |> string |> Decode.Auto.unsafeFromString<WebSocketClientMessage>
 
-                // Here we handle any websocket client messages in a type-safe manner
                 match message with
                 | TextMessage message ->
                     let text = sprintf "Websocket message: %s" message
                     let message = { Id = Guid.NewGuid(); Time = System.DateTime.UtcNow; Text = text }
                     db.AddMessage (message) |> ignore
                     do! broadcastMessage hub (BroadcastMessage message)
+                | GetMessages _ ->
+                    let messages = db.GetMessages ()
+                    do! sendMessage hub clientInfo.SocketId (BroadcastMessages messages)
             })
     }
 

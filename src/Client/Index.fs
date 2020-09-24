@@ -29,6 +29,7 @@ type Msg =
     | ConnectionChange of ConnectionState
     | MessageChanged of string
     | Broadcast of BroadcastMode * string
+    | SyncState
 
 module Channel = 
     open Browser.WebSocket
@@ -36,7 +37,7 @@ module Channel =
     let inline decode<'a> x = x |> unbox<string> |> Thoth.Json.Decode.Auto.unsafeFromString<'a>
     let buildWsSender (ws:WebSocket) : WsSender =
         fun (message:WebSocketClientMessage) ->
-            let message = {| Topic = ""; Ref = ""; Payload = message |}
+            let message = { Topic = ""; Ref = ""; Payload = message }
             let message = Thoth.Json.Encode.Auto.toString(0, message)
             ws.send message
 
@@ -79,12 +80,26 @@ let update msg model : Model * Cmd<Msg> =
     | MessageChanged msg ->
         { model with MessageToSend = msg }, Cmd.none
     | ConnectionChange status ->
-        { model with ConnectionState = status }, Cmd.none
-    | ReceivedFromServer (BroadcastMessage message) ->
-        { model with ReceivedMessages = message :: model.ReceivedMessages }, Cmd.none
+        let model = { model with ConnectionState = status }
+        match status with
+        | ConnectedToServer _ ->
+            model, Cmd.ofMsg SyncState
+        | _ ->
+            model, Cmd.none
+    | ReceivedFromServer message ->
+        match message with
+        | BroadcastMessage msg -> 
+            { model with ReceivedMessages = msg :: model.ReceivedMessages }, Cmd.none
+        | BroadcastMessages msgs ->
+            { model with ReceivedMessages = msgs }, Cmd.none
     | Broadcast (ViaWebSocket, msg) ->
         match model.ConnectionState with
         | ConnectedToServer sender -> sender (TextMessage msg)
+        | _ -> ()
+        model, Cmd.none
+    | SyncState ->
+        match model.ConnectionState with
+        | ConnectedToServer sender -> sender (GetMessages 1)
         | _ -> ()
         model, Cmd.none
     | Broadcast (ViaHTTP, msg) ->
