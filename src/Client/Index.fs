@@ -2,6 +2,8 @@ module Index
 
 open Elmish
 open Fable.React
+open Fable.React.Props
+open Fable.React.Helpers
 open Thoth.Json
 open Thoth.Fetch
 open Fulma
@@ -121,14 +123,65 @@ module ViewParts =
             | ConnectedToServer _ -> str "Connected to server"
         ]
 
+let inline ReactComponent name render = FunctionComponent.Of(render, name, equalsButFunctions)
+
+type Menu = {
+    CurrentRoute : string
+}
+
+type HTMLAttr =
+    | [<CompiledName("data-target")>] DataTarget of string
+    | [<CompiledName("data-placement")>] DataPlacement of string
+    | [<CompiledName("data-dismiss")>] DataDismiss of string
+    | [<CompiledName("aria-hidden")>] AriaHidden of bool
+    | [<CompiledName("aria-label")>] AriaLabel of string
+    | [<CompiledName("aria-labelledby")>] AriaLabelledBy of string
+    | [<CompiledName("data-live-search")>] DataLiveSearch of bool
+    | [<CompiledName("data-content")>] DataContent of string
+    interface IHTMLProp
+
+let private routeItem name iconName route current =
+    li [ classList [ "nav-item", true; "active", route = current ] ] [
+        a [ ClassName "nav-link"; Href "" ] [
+            //yield icon iconName
+            yield str name
+            if route = current then
+                yield span [ ClassName "sr-only" ] [ str "(current)" ]
+            else
+                ignore()
+        ]
+    ]
+
+let MenuComponent = ReactComponent "Menu" (fun (props : Menu) ->
+    nav [ ClassName "navbar navbar-expand-lg navbar-dark bg-primary fixed-top" ] [
+        div [ ClassName "container" ] [
+            a [ ClassName "navbar-brand"; Href "#" ] [ str "Scrum Poker" ]
+            button [ ClassName "navbar-toggler";
+                     Typeof "button";
+                     DataToggle "collapse";
+                     DataTarget "#navbarNavDropdown";
+                     AriaControls "navbarNavDropdown";
+                     AriaExpanded false;
+                     AriaLabel "Toggle navigation" ] [
+                span [ ClassName "navbar-toggler-icon" ] []
+            ]
+            div [ ClassName "collapse navbar-collapse"; Id "navbarNavDropdown" ] [
+                ul [ ClassName "navbar-nav mr-auto" ] [
+                    routeItem "Home" "" "" ""
+                    routeItem "New Post" "compose" "" ""
+                    routeItem "Settings" "gear-a" "" ""
+                    routeItem "Pavlo Hrushetsky" "person" "" ""
+                    routeItem "Sign up" "person-add" "" ""
+                ]
+            ]            
+        ]
+    ])
+
 let view (model : Model) (dispatch : Msg -> unit) =
     div [] [
-        Navbar.navbar [ Navbar.Color IsPrimary ] [
-            Navbar.Item.div [ ] [
-                Heading.h2 [ ] [ str "SAFE Channels Template" ]
-            ]
-        ]
-        Container.container [] [
+        { CurrentRoute = "" } |> MenuComponent
+        main [ Role "main"; ClassName "container" ] [
+        //Container.container [] [
             Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ] [
                 Heading.h3 [] [ str "Send a message!" ]
                 Input.text [ Input.OnChange(fun e -> dispatch(MessageChanged e.Value)) ]
