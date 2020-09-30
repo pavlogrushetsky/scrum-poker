@@ -3,10 +3,8 @@ module Index
 open Elmish
 open Fable.React
 open Fable.React.Props
-open Fable.React.Helpers
 open Thoth.Json
 open Thoth.Fetch
-open Fulma
 open Browser.Types
 open Shared
 open System
@@ -110,18 +108,12 @@ let update msg model : Model * Cmd<Msg> =
 
 module ViewParts =
     let drawStatus connectionState =
-        Tag.tag [
-            Tag.Color
-                (match connectionState with
-                 | DisconnectedFromServer -> Color.IsDanger
-                 | Connecting -> Color.IsWarning
-                 | ConnectedToServer _ -> Color.IsSuccess)
-        ] [
+        let className, text =
             match connectionState with
-            | DisconnectedFromServer -> str "Disconnected from server"
-            | Connecting -> str "Connecting..."
-            | ConnectedToServer _ -> str "Connected to server"
-        ]
+            | DisconnectedFromServer -> "danger", "Disconnected from server"
+            | Connecting -> "secondary", "Connecting..."
+            | ConnectedToServer _ -> "success", "Connected to server"
+        span [ ClassName (sprintf "badge badge-%s" className) ] [ str text ]
 
 let inline ReactComponent name render = FunctionComponent.Of(render, name, equalsButFunctions)
 
@@ -152,6 +144,9 @@ let private routeItem name iconName route current =
         ]
     ]
 
+let icon name =
+    i [ ClassName (sprintf "fab fa-lg fa-%s" name); Style [ MarginRight "3px" ] ] []
+
 let MenuComponent = ReactComponent "Menu" (fun (props : Menu) ->
     nav [ ClassName "navbar navbar-expand-lg navbar-dark bg-primary fixed-top" ] [
         div [ ClassName "container" ] [
@@ -168,10 +163,14 @@ let MenuComponent = ReactComponent "Menu" (fun (props : Menu) ->
             div [ ClassName "collapse navbar-collapse"; Id "navbarNavDropdown" ] [
                 ul [ ClassName "navbar-nav mr-auto" ] [
                     routeItem "Home" "" "" ""
-                    routeItem "New Post" "compose" "" ""
-                    routeItem "Settings" "gear-a" "" ""
-                    routeItem "Pavlo Hrushetsky" "person" "" ""
-                    routeItem "Sign up" "person-add" "" ""
+                    routeItem "About" "compose" "" ""
+                ]
+                ul [ ClassName "navbar-nav mr-md-2" ] [
+                    li [ ClassName "nav-item" ] [
+                        a [ ClassName "nav-link"; Href "https://github.com/pavlogrushetsky/scrum-poker"; Target "_blank" ] [
+                            icon "github"
+                        ]
+                    ]
                 ]
             ]            
         ]
@@ -181,50 +180,57 @@ let view (model : Model) (dispatch : Msg -> unit) =
     div [] [
         { CurrentRoute = "" } |> MenuComponent
         main [ Role "main"; ClassName "container" ] [
-        //Container.container [] [
-            Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ] [
-                Heading.h3 [] [ str "Send a message!" ]
-                Input.text [ Input.OnChange(fun e -> dispatch(MessageChanged e.Value)) ]
-            ]
-            Columns.columns [] [
-                for broadcastMethod in [ ViaHTTP; ViaWebSocket ] do
-                    Column.column [] [
-                        Button.button
-                            [ Button.IsFullWidth
-                              Button.Color IsPrimary
-                              Button.Disabled (String.IsNullOrEmpty model.MessageToSend || not model.ConnectionState.IsConnected)
-                              Button.OnClick (fun _ -> dispatch (Broadcast (broadcastMethod, model.MessageToSend))) ]
-                            [ str (sprintf "Click to broadcast %O!" broadcastMethod) ]
-                    ]
-            ]
-
-            ViewParts.drawStatus model.ConnectionState
-
-            match model.ReceivedMessages with
-            | [] ->
-                ()
-            | messages ->
-                Table.table [] [
-                    thead [] [
-                        tr [] [
-                            td [] [ str "Time" ]
-                            td [] [ str "Message" ]
-                        ]
-                    ]
-                    tbody [][
-                        for message in messages do
-                            tr [] [
-                                td [] [ str (sprintf "%O" message.Time) ]
-                                td [] [ str message.Text ]
-                            ]
-                    ]
-                    tfoot [] []
+            h3 [] [ str "Send a message!" ]
+            div [ ClassName "row" ] [
+                div [ ClassName "col" ] [
+                    div [ ClassName "form-group" ] [
+                        label [ HtmlFor "messageInput"; ClassName "bmd-label-floating" ] [ str "Message" ]
+                        input [ Typeof "text"; ClassName "form-control"; Id "messageInput"; OnChange (fun e -> dispatch(MessageChanged e.Value)) ]
+                    ]                    
                 ]
-        ]
-        Footer.footer [ ] [
-            Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ] [
-                str "Demo by Compositional IT"
+                div [ ClassName "col-md-auto my-auto" ] [
+                    button [ 
+                        Typeof "button"; 
+                        ClassName "btn btn-outline-primary"; 
+                        Disabled (String.IsNullOrEmpty model.MessageToSend || not model.ConnectionState.IsConnected)
+                        OnClick (fun _ -> dispatch (Broadcast (ViaWebSocket, model.MessageToSend))) ] [ str "Broadcast"]
+                ]
             ]
+            div [ ClassName "row" ] [
+                div [ ClassName "col" ] [ ViewParts.drawStatus model.ConnectionState ]               
+            ]
+            div [ ClassName "row" ] [
+                div [ ClassName "col" ] [ 
+                    match model.ReceivedMessages with
+                    | [] ->
+                        ()
+                    | messages ->
+                        table [ ClassName "table table-dorderless table-hover" ] [
+                            thead [ ClassName "thead" ] [
+                                tr [] [
+                                    th [ Scope "col" ] [ str "Time" ]
+                                    th [ Scope "col" ] [ str "Message" ]
+                                ]
+                            ]
+                            tbody [][
+                                for message in messages do
+                                    tr [] [
+                                        td [] [ str (sprintf "%O" message.Time) ]
+                                        td [] [ str message.Text ]
+                                    ]
+                            ]
+                            tfoot [] []
+                        ]
+                ]               
+            ]                   
+        ]
+        footer [ ClassName "footer" ] [
+            div [ ClassName "container" ] [
+                p [ ClassName "float-right" ] [
+                    a [ Href "#" ] [ str "Back to top" ]
+                ]
+                p [] [ str "© 2020" ]
+            ]           
         ]
     ]
 
