@@ -4,6 +4,7 @@ storage: none
 
 nuget Fable.Browser.WebSocket
 nuget Fable.Remoting.Giraffe
+nuget Feliz
 nuget LiteDB.FSharp
 nuget Saturn
 nuget Expecto
@@ -18,6 +19,7 @@ nuget Fable.React
 nuget Fable.Remoting.Client
 nuget Thoth.Fetch
 nuget Thoth.Json.Giraffe
+nuget Zanaptak.TypedCssClasses
 
 group Build
     source https://api.nuget.org/v3/index.json

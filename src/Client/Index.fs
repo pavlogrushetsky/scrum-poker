@@ -3,11 +3,14 @@ module Index
 open Elmish
 open Fable.React
 open Fable.React.Props
+open Feliz
 open Thoth.Json
 open Thoth.Fetch
 open Browser.Types
 open Shared
 open System
+
+open Style
 
 /// Status of the websocket.
 type WsSender = WebSocketClientMessage -> unit
@@ -121,58 +124,93 @@ type Menu = {
     CurrentRoute : string
 }
 
-type HTMLAttr =
-    | [<CompiledName("data-target")>] DataTarget of string
-    | [<CompiledName("data-placement")>] DataPlacement of string
-    | [<CompiledName("data-dismiss")>] DataDismiss of string
-    | [<CompiledName("aria-hidden")>] AriaHidden of bool
-    | [<CompiledName("aria-label")>] AriaLabel of string
-    | [<CompiledName("aria-labelledby")>] AriaLabelledBy of string
-    | [<CompiledName("data-live-search")>] DataLiveSearch of bool
-    | [<CompiledName("data-content")>] DataContent of string
-    interface IHTMLProp
-
-let private routeItem name iconName route current =
-    li [ classList [ "nav-item", true; "active", route = current ] ] [
-        a [ ClassName "nav-link"; Href "" ] [
-            //yield icon iconName
-            yield str name
-            if route = current then
-                yield span [ ClassName "sr-only" ] [ str "(current)" ]
-            else
-                ignore()
+let private routeItem (name : string) iconName route current =
+    Html.li [
+        prop.className [ 
+            Bs.``nav-item``
+            if route = current then Bs.active
+        ]
+        prop.children [
+            Html.a [
+                prop.className [ Bs.``nav-link`` ]
+                prop.href ""
+                prop.children [
+                    Html.text name
+                    if route = current then
+                        Html.span [
+                            prop.className Bs.``sr-only``
+                            prop.text "(current)"
+                        ]
+                ]
+            ]
         ]
     ]
 
 let icon name =
-    i [ ClassName (sprintf "fab fa-lg fa-%s" name); Style [ MarginRight "3px" ] ] []
+    Html.i [
+        prop.className [ Fa.fab; Fa.``fa-lg``; name ]
+        prop.style [ style.marginRight 3 ]
+    ]
 
 let MenuComponent = ReactComponent "Menu" (fun (props : Menu) ->
-    nav [ ClassName "navbar navbar-expand-lg navbar-dark bg-primary fixed-top" ] [
-        div [ ClassName "container" ] [
-            a [ ClassName "navbar-brand"; Href "#" ] [ str "Scrum Poker" ]
-            button [ ClassName "navbar-toggler";
-                     Typeof "button";
-                     DataToggle "collapse";
-                     DataTarget "#navbarNavDropdown";
-                     AriaControls "navbarNavDropdown";
-                     AriaExpanded false;
-                     AriaLabel "Toggle navigation" ] [
-                span [ ClassName "navbar-toggler-icon" ] []
-            ]
-            div [ ClassName "collapse navbar-collapse"; Id "navbarNavDropdown" ] [
-                ul [ ClassName "navbar-nav mr-auto" ] [
-                    routeItem "Home" "" "" ""
-                    routeItem "About" "compose" "" ""
-                ]
-                ul [ ClassName "navbar-nav mr-md-2" ] [
-                    li [ ClassName "nav-item" ] [
-                        a [ ClassName "nav-link"; Href "https://github.com/pavlogrushetsky/scrum-poker"; Target "_blank" ] [
-                            icon "github"
+    Html.nav [
+        prop.className [ Bs.navbar; Bs.``navbar-expand-lg``; Bs.``navbar-dark``; Bs.``bg-primary``; Bs.``fixed-top`` ]
+        prop.children [
+            Html.div [
+                prop.className Bs.container
+                prop.children [
+                    Html.a [
+                        prop.className Bs.``navbar-brand``
+                        prop.href ""
+                        prop.text "Scrum Poker"
+                    ]
+                    Html.button [
+                        prop.className Bs.``navbar-toggler``
+                        prop.type' "button"
+                        prop.dataToggle "collapse"
+                        prop.dataTarget "#navbarNavDropdown"
+                        prop.ariaControls "navbarNavDropdown"
+                        prop.ariaExpanded false
+                        prop.ariaLabel "Toggle navigation"
+                        prop.children [
+                            Html.span [
+                                prop.className Bs.``navbar-toggler-icon``
+                            ]
+                        ]
+                    ]
+                    Html.div [
+                        prop.className [ Bs.collapse; Bs.``navbar-collapse`` ]
+                        prop.id "navbarNavDropdown"
+                        prop.children [
+                            Html.ul [
+                                prop.className [ Bs.``navbar-nav``; Bs.``mr-auto`` ]
+                                prop.children [
+                                    routeItem "Home" "" "" ""
+                                    routeItem "About" "compose" "" ""
+                                ]
+                            ]
+                            Html.ul [
+                                prop.className [ Bs.``navbar-nav``; Bs.``mr-md-2`` ]
+                                prop.children [
+                                    Html.li [
+                                        prop.className Bs.``nav-item``
+                                        prop.children [
+                                            Html.a [
+                                                prop.className Bs.``nav-link``
+                                                prop.href "https://github.com/pavlogrushetsky/scrum-poker"
+                                                prop.target "_blank"
+                                                prop.children [
+                                                    icon Fa.``fa-github``
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
                         ]
                     ]
                 ]
-            ]            
+            ]
         ]
     ])
 
@@ -205,32 +243,67 @@ let view (model : Model) (dispatch : Msg -> unit) =
                     | [] ->
                         ()
                     | messages ->
-                        table [ ClassName "table table-dorderless table-hover" ] [
-                            thead [ ClassName "thead" ] [
-                                tr [] [
-                                    th [ Scope "col" ] [ str "Time" ]
-                                    th [ Scope "col" ] [ str "Message" ]
+                        Html.table [
+                            prop.className [ Bs.table; "table-borderless"; Bs.``table-hover`` ]
+                            prop.children [
+                                Html.thead [
+                                    prop.className "thead"
+                                    prop.children [
+                                        Html.tr [
+                                            prop.children [
+                                                Html.th [ 
+                                                    prop.scope "col"
+                                                    prop.text "Time"
+                                                ]
+                                                Html.th [ 
+                                                    prop.scope "col"
+                                                    prop.text "Message"
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                                Html.tbody [
+                                    prop.children [
+                                        for message in messages do
+                                            Html.tr [
+                                                prop.children [
+                                                    Html.td [ prop.text (sprintf "%O" message.Time) ]
+                                                    Html.td [ prop.text message.Text ]
+                                                ]
+                                            ]
+                                    ]
                                 ]
                             ]
-                            tbody [][
-                                for message in messages do
-                                    tr [] [
-                                        td [] [ str (sprintf "%O" message.Time) ]
-                                        td [] [ str message.Text ]
-                                    ]
-                            ]
-                            tfoot [] []
                         ]
                 ]               
             ]                   
         ]
-        footer [ ClassName "footer" ] [
-            div [ ClassName "container" ] [
-                p [ ClassName "float-right" ] [
-                    a [ Href "#" ] [ str "Back to top" ]
+        Html.footer [
+            prop.style [
+                style.bottom 0
+                style.width (length.percent 100)
+                style.height (length.px 60)
+                style.lineHeight (length.px 60)
+                style.backgroundColor "#fafafa"
+            ]
+            prop.children [
+                Html.div [
+                    prop.className Bs.container
+                    prop.children [
+                        Html.p [
+                            prop.className Bs.``float-right``
+                            prop.children [
+                                Html.a [
+                                    prop.href "#"
+                                    prop.text "Back to top"
+                                ]
+                            ]
+                        ]
+                        Html.p [ prop.text "© 2020 Pavlo Hrushetskyi" ]
+                    ]
                 ]
-                p [] [ str "© 2020" ]
-            ]           
+            ]
         ]
     ]
 

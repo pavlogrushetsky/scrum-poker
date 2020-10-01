@@ -98,6 +98,10 @@ NUGET
       Fable.Core (>= 3.1.5)
       Fable.Parsimmon (>= 4.0)
       FSharp.Core (>= 4.7)
+    Feliz (1.14)
+      Fable.Core (>= 3.1.5)
+      Fable.React (>= 7.0.1)
+      FSharp.Core (>= 4.7.2)
     FSharp.Control.Websockets (0.2.2) - restriction: || (== netcoreapp3.1) (&& (== netstandard2.0) (>= netcoreapp3.1))
       FSharp.Core (>= 4.3.4)
       Microsoft.IO.RecyclableMemoryStream (>= 1.2.2)
@@ -213,6 +217,8 @@ NUGET
       System.Reflection.Emit.Lightweight (>= 4.3)
       System.Threading.Tasks.Extensions (>= 4.4)
       System.ValueTuple (>= 4.4)
+    Zanaptak.TypedCssClasses (0.4)
+      FSharp.Core (>= 4.3.4)
 
 GROUP Build
 STORAGE: NONE
