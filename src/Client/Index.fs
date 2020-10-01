@@ -3,6 +3,8 @@ module Index
 open Elmish
 open Fable.React
 open Fable.React.Props
+open Elmish.Navigation
+open Fable.Import
 open Feliz
 open Thoth.Json
 open Thoth.Fetch
@@ -11,6 +13,7 @@ open Shared
 open System
 
 open App.Style
+open App.Routing
 open App.Components.Menu
 open App.Model
 
@@ -53,10 +56,31 @@ module Channel =
 
         Cmd.ofSub sub
 
-let init () =
-    { MessageToSend = null
-      ConnectionState = DisconnectedFromServer
-      ReceivedMessages = [] }, Cmd.none
+let private notFound (model : Model) =
+    Fable.Core.JS.console.error("Error parsing url: " + Browser.Dom.window.location.href)
+    (model, Navigation.modifyUrl (routeHash NotFoundRoute))
+
+let updateRoute (route : PageRoute option) (model : Model) =
+    match route with
+    | Some HomeRoute ->
+        model, Cmd.none
+    | Some (RoomRoute roomName) ->
+        model, Cmd.none
+    | Some AboutRoute ->
+        model, Cmd.none
+    | Some NotFoundRoute ->
+        model, Cmd.none
+    | None ->
+        notFound model
+
+let init page : Model * Cmd<Msg> =
+    let defaultModel () =
+        let model = 
+            { MessageToSend = null
+              ConnectionState = DisconnectedFromServer
+              ReceivedMessages = [] }
+        updateRoute page model
+    defaultModel ()
 
 let update msg model : Model * Cmd<Msg> =
     match msg with
@@ -100,7 +124,7 @@ module ViewParts =
 
 let view (model : Model) (dispatch : Msg -> unit) =
     div [] [
-        menu ""
+        menu HomeRoute
         main [ Role "main"; ClassName "container" ] [
             h3 [] [ str "Send a message!" ]
             div [ ClassName "row" ] [

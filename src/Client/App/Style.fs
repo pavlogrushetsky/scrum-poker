@@ -3,6 +3,8 @@ module App.Style
 open Feliz
 open Zanaptak.TypedCssClasses
 
+open App.Routing
+
 type Bs = CssClasses<"https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css", Naming.Verbatim>     
 
 type Fa = CssClasses<"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css", Naming.Verbatim>
@@ -22,7 +24,8 @@ type Html with
             prop.children [
                 Html.a [
                     prop.className [ Bs.``nav-link`` ]
-                    prop.href ""
+                    prop.href (routeHash target)
+                    prop.onClick goToUrl
                     prop.children [
                         Html.text name
                         if target = current then

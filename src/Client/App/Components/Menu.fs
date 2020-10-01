@@ -4,9 +4,10 @@ open Elmish
 open Feliz
 
 open App.Style
+open App.Routing
 
 type Menu = {
-    CurrentRoute : string
+    CurrentRoute : PageRoute
 }
 
 let private menu' = React.functionComponent("Menu", fun (props : Menu) ->
@@ -42,8 +43,9 @@ let private menu' = React.functionComponent("Menu", fun (props : Menu) ->
                             Html.ul [
                                 prop.className [ Bs.``navbar-nav``; Bs.``mr-auto`` ]
                                 prop.children [
-                                    Html.route "Home" "" "" ""
-                                    Html.route "About" "compose" "" ""
+                                    Html.route "Home" "" HomeRoute props.CurrentRoute
+                                    Html.route "Room #1" "" (RoomRoute "Room #1") props.CurrentRoute
+                                    Html.route "About" "" AboutRoute props.CurrentRoute
                                 ]
                             ]
                             Html.ul [

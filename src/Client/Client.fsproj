@@ -8,7 +8,8 @@
     <None Include="index.html" />
     <None Include="paket.references" />
     <None Include="site.css" />
-    <Compile Include="App\Style.fs" />
+    <Compile Include="App\Routing.fs" />
+    <Compile Include="App\Style.fs" />   
     <Compile Include="App\Components\Menu.fs" />
     <Compile Include="App\Model.fs" />
     <Compile Include="App\View.fs" />
