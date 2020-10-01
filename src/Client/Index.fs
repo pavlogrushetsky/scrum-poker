@@ -10,29 +10,9 @@ open Browser.Types
 open Shared
 open System
 
-open Style
-
-/// Status of the websocket.
-type WsSender = WebSocketClientMessage -> unit
-type BroadcastMode = ViaWebSocket | ViaHTTP
-type ConnectionState =
-    | DisconnectedFromServer | ConnectedToServer of WsSender | Connecting
-    member this.IsConnected =
-        match this with
-        | ConnectedToServer _ -> true
-        | DisconnectedFromServer | Connecting -> false
-
-type Model =
-    { MessageToSend : string
-      ReceivedMessages : Message list
-      ConnectionState : ConnectionState }
-
-type Msg =
-    | ReceivedFromServer of WebSocketServerMessage
-    | ConnectionChange of ConnectionState
-    | MessageChanged of string
-    | Broadcast of BroadcastMode * string
-    | SyncState
+open App.Style
+open App.Components.Menu
+open App.Model
 
 module Channel = 
     open Browser.WebSocket
@@ -118,105 +98,9 @@ module ViewParts =
             | ConnectedToServer _ -> "success", "Connected to server"
         span [ ClassName (sprintf "badge badge-%s" className) ] [ str text ]
 
-let inline ReactComponent name render = FunctionComponent.Of(render, name, equalsButFunctions)
-
-type Menu = {
-    CurrentRoute : string
-}
-
-let private routeItem (name : string) iconName route current =
-    Html.li [
-        prop.className [ 
-            Bs.``nav-item``
-            if route = current then Bs.active
-        ]
-        prop.children [
-            Html.a [
-                prop.className [ Bs.``nav-link`` ]
-                prop.href ""
-                prop.children [
-                    Html.text name
-                    if route = current then
-                        Html.span [
-                            prop.className Bs.``sr-only``
-                            prop.text "(current)"
-                        ]
-                ]
-            ]
-        ]
-    ]
-
-let icon name =
-    Html.i [
-        prop.className [ Fa.fab; Fa.``fa-lg``; name ]
-        prop.style [ style.marginRight 3 ]
-    ]
-
-let MenuComponent = ReactComponent "Menu" (fun (props : Menu) ->
-    Html.nav [
-        prop.className [ Bs.navbar; Bs.``navbar-expand-lg``; Bs.``navbar-dark``; Bs.``bg-primary``; Bs.``fixed-top`` ]
-        prop.children [
-            Html.div [
-                prop.className Bs.container
-                prop.children [
-                    Html.a [
-                        prop.className Bs.``navbar-brand``
-                        prop.href ""
-                        prop.text "Scrum Poker"
-                    ]
-                    Html.button [
-                        prop.className Bs.``navbar-toggler``
-                        prop.type' "button"
-                        prop.dataToggle "collapse"
-                        prop.dataTarget "#navbarNavDropdown"
-                        prop.ariaControls "navbarNavDropdown"
-                        prop.ariaExpanded false
-                        prop.ariaLabel "Toggle navigation"
-                        prop.children [
-                            Html.span [
-                                prop.className Bs.``navbar-toggler-icon``
-                            ]
-                        ]
-                    ]
-                    Html.div [
-                        prop.className [ Bs.collapse; Bs.``navbar-collapse`` ]
-                        prop.id "navbarNavDropdown"
-                        prop.children [
-                            Html.ul [
-                                prop.className [ Bs.``navbar-nav``; Bs.``mr-auto`` ]
-                                prop.children [
-                                    routeItem "Home" "" "" ""
-                                    routeItem "About" "compose" "" ""
-                                ]
-                            ]
-                            Html.ul [
-                                prop.className [ Bs.``navbar-nav``; Bs.``mr-md-2`` ]
-                                prop.children [
-                                    Html.li [
-                                        prop.className Bs.``nav-item``
-                                        prop.children [
-                                            Html.a [
-                                                prop.className Bs.``nav-link``
-                                                prop.href "https://github.com/pavlogrushetsky/scrum-poker"
-                                                prop.target "_blank"
-                                                prop.children [
-                                                    icon Fa.``fa-github``
-                                                ]
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-    ])
-
 let view (model : Model) (dispatch : Msg -> unit) =
     div [] [
-        { CurrentRoute = "" } |> MenuComponent
+        menu ""
         main [ Role "main"; ClassName "container" ] [
             h3 [] [ str "Send a message!" ]
             div [ ClassName "row" ] [

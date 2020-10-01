@@ -7,7 +7,11 @@
   <ItemGroup>
     <None Include="index.html" />
     <None Include="paket.references" />
-    <Compile Include="Style.fs" />
+    <None Include="site.css" />
+    <Compile Include="App\Style.fs" />
+    <Compile Include="App\Components\Menu.fs" />
+    <Compile Include="App\Model.fs" />
+    <Compile Include="App\View.fs" />
     <Compile Include="Index.fs" />
     <Compile Include="App.fs" />
   </ItemGroup>
