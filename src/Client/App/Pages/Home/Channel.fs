@@ -1,4 +1,4 @@
-module App.Channel
+module Pages.Home.Channel
 
 open Elmish
 open Fable.Import
@@ -7,7 +7,7 @@ open Browser.WebSocket
 
 open Shared
 
-open App.Model
+open Pages.Home
 
 let inline decode<'a> x = x |> unbox<string> |> Thoth.Json.Decode.Auto.unsafeFromString<'a>
 let buildWsSender (ws:WebSocket) : WsSender =

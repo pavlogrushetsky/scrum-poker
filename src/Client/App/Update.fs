@@ -9,6 +9,7 @@ open Shared
 
 open App.Routing
 open App.Model
+open Pages
 
 let private notFound (model : Model) =
     Fable.Core.JS.console.error("Error parsing url: " + Browser.Dom.window.location.href)
@@ -17,52 +18,49 @@ let private notFound (model : Model) =
 let updateRoute (route : PageRoute option) (model : Model) =
     match route with
     | Some HomeRoute ->
-        model, Cmd.none
+        let model', cmd = Home.Update.init()
+        let menu = { model.Menu with CurrentRoute = HomeRoute }
+        { model with Page = Home model'; Menu = menu }, Cmd.map HomeMsg cmd
     | Some (RoomRoute roomName) ->
-        model, Cmd.none
+        let model', cmd = Room.Update.init()
+        let menu = { model.Menu with CurrentRoute = (RoomRoute roomName) }
+        { model with Page = Room model'; Menu = menu }, Cmd.map RoomMsg cmd
     | Some AboutRoute ->
-        model, Cmd.none
+        let model', cmd = About.Update.init()
+        let menu = { model.Menu with CurrentRoute = AboutRoute }
+        { model with Page = About model'; Menu = menu }, Cmd.map AboutMsg cmd
     | Some NotFoundRoute ->
-        model, Cmd.none
+        { model with Page = NotFound }, Cmd.none
     | None ->
         notFound model
 
 let init page : Model * Cmd<Msg> =
     let defaultModel () =
+        let homeModel, _ = Home.Update.init ()
         let model = 
-            { MessageToSend = null
-              ConnectionState = DisconnectedFromServer
-              ReceivedMessages = [] }
+            { Menu = { CurrentRoute = HomeRoute }
+              Page = Home homeModel }
         updateRoute page model
     defaultModel ()
 
-let update msg model : Model * Cmd<Msg> =
-    match msg with
-    | MessageChanged msg ->
-        { model with MessageToSend = msg }, Cmd.none
-    | ConnectionChange status ->
-        let model = { model with ConnectionState = status }
-        match status with
-        | ConnectedToServer _ ->
-            model, Cmd.ofMsg SyncState
-        | _ ->
-            model, Cmd.none
-    | ReceivedFromServer message ->
-        match message with
-        | BroadcastMessage msg -> 
-            { model with ReceivedMessages = msg :: model.ReceivedMessages }, Cmd.none
-        | BroadcastMessages msgs ->
-            { model with ReceivedMessages = msgs }, Cmd.none
-    | Broadcast (ViaWebSocket, msg) ->
-        match model.ConnectionState with
-        | ConnectedToServer sender -> sender (TextMessage msg)
-        | _ -> ()
+let private updatePage updateFunc pageCtor msgCtor model =
+    let updatedModel, updatedCmd = updateFunc
+    { model with Page = pageCtor updatedModel }, Cmd.map msgCtor updatedCmd
+
+let subscription (model : Model) =
+    Cmd.batch [ Cmd.map HomeMsg (Home.Channel.subscription model) ]   
+
+let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
+    match msg, model.Page with
+    | HomeMsg msg, Home m ->
+        model |> updatePage (Home.Update.update msg m) Home HomeMsg        
+    | RoomMsg msg, Room m ->
+        model |> updatePage (Room.Update.update msg m) Room RoomMsg
+    | AboutMsg msg, About m ->
+        model |> updatePage (About.Update.update msg m) About AboutMsg
+    | HomeMsg _, _ ->
         model, Cmd.none
-    | SyncState ->
-        match model.ConnectionState with
-        | ConnectedToServer sender -> sender (GetMessages 1)
-        | _ -> ()
+    | RoomMsg _, _ ->
         model, Cmd.none
-    | Broadcast (ViaHTTP, msg) ->
-        let post = Fetch.post("/api/broadcast", msg)
-        model, Cmd.OfPromise.result post
+    | AboutMsg _, _ ->
+        model, Cmd.none
