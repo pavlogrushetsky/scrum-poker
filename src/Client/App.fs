@@ -8,13 +8,13 @@ open Elmish.Debug
 open Elmish.HMR
 #endif
 
-Program.mkProgram Index.init Index.update Index.view
-|> Program.withSubscription Index.Channel.subscription
-|> Program.toNavigable App.Routing.parseRoute Index.updateRoute
-|> Program.withReactBatched "elmish-app"
+Program.mkProgram App.Update.init App.Update.update App.View.view
+|> Program.withSubscription App.Channel.subscription
+|> Program.toNavigable App.Routing.parseRoute App.Update.updateRoute
+|> Program.withReactSynchronous "elmish-app"
 #if DEBUG
 |> Program.withConsoleTrace
 |> Program.withDebugger
-|> Program.withDebuggerCoders (fst Index.extras) (snd Index.extras)
+|> Program.withDebuggerCoders (fst App.Debug.extras) (snd App.Debug.extras)
 #endif
 |> Program.run
