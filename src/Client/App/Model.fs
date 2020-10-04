@@ -2,23 +2,20 @@ module App.Model
 
 open Shared
 
-type WsSender = WebSocketClientMessage -> unit
-type BroadcastMode = ViaWebSocket | ViaHTTP
-type ConnectionState =
-    | DisconnectedFromServer | ConnectedToServer of WsSender | Connecting
-    member this.IsConnected =
-        match this with
-        | ConnectedToServer _ -> true
-        | DisconnectedFromServer | Connecting -> false
+open Pages
+open App.Components.Menu
+
+type Page =
+    | Home of Home.Model
+    | Room of Room.Model
+    | About of About.Model
+    | NotFound
 
 type Model =
-    { MessageToSend : string
-      ReceivedMessages : Message list
-      ConnectionState : ConnectionState }
+    { Menu : Menu
+      Page : Page }
 
 type Msg =
-    | ReceivedFromServer of WebSocketServerMessage
-    | ConnectionChange of ConnectionState
-    | MessageChanged of string
-    | Broadcast of BroadcastMode * string
-    | SyncState
+    | HomeMsg of Home.Msg
+    | RoomMsg of Room.Msg
+    | AboutMsg of About.Msg

@@ -1,25 +1,31 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <DefineConstants>FABLE_COMPILER</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.fsproj" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="index.html" />
     <None Include="paket.references" />
     <None Include="site.css" />
-    <Compile Include="App\Routing.fs" />
-    <Compile Include="App\Style.fs" />   
-    <Compile Include="App\Components\Menu.fs" />
-    <Compile Include="App\Model.fs" />
-    <Compile Include="App\Channel.fs" />
-    <Compile Include="App\Update.fs" />
-    <Compile Include="App\View.fs" />
-    <Compile Include="App\Debug.fs" />
+    <Compile Include="App/Routing.fs" />
+    <Compile Include="App/Style.fs" />
+    <Compile Include="App/Components/Menu.fs" />
+    <Compile Include="App/Pages/Home/Model.fs" />
+    <Compile Include="App/Pages/Home/View.fs" />
+    <Compile Include="App/Pages/Home/Channel.fs" />
+    <Compile Include="App/Pages/Home/Update.fs" />
+    <Compile Include="App/Pages/Room/Model.fs" />
+    <Compile Include="App/Pages/Room/View.fs" />
+    <Compile Include="App/Pages/Room/Update.fs" />
+    <Compile Include="App/Pages/About/Model.fs" />
+    <Compile Include="App/Pages/About/View.fs" />
+    <Compile Include="App/Pages/About/Update.fs" />
+    <Compile Include="App/Model.fs" />
+    <Compile Include="App/Update.fs" />
+    <Compile Include="App/View.fs" />
     <Compile Include="App.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Shared\Shared.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
