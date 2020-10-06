@@ -4,11 +4,14 @@ open Elmish
 open Elmish.Navigation
 open Fable.Import
 open Thoth.Fetch
+open Browser.Types
+open Browser.WebSocket
 
 open Shared
 
 open App.Routing
 open App.Model
+open App.Channel
 open Pages
 
 let private notFound (model : Model) =
@@ -18,7 +21,7 @@ let private notFound (model : Model) =
 let updateRoute (route : PageRoute option) (model : Model) =
     match route with
     | Some HomeRoute ->
-        let model', cmd = Home.Update.init()
+        let model', cmd = Home.Update.init model.ConnectionState
         let menu = { model.Menu with CurrentRoute = HomeRoute }
         { model with Page = Home model'; Menu = menu }, Cmd.map HomeMsg cmd
     | Some (RoomRoute roomName) ->
@@ -36,19 +39,54 @@ let updateRoute (route : PageRoute option) (model : Model) =
 
 let init page : Model * Cmd<Msg> =
     let defaultModel () =
-        let homeModel, _ = Home.Update.init ()
+        let connectionState = DisconnectedFromServer
+        let homeModel, _ = Home.Update.init connectionState
         let model = 
-            { Menu = { CurrentRoute = HomeRoute }
+            { ConnectionState = DisconnectedFromServer
+              Menu = { CurrentRoute = HomeRoute }
               Page = Home homeModel }
         updateRoute page model
     defaultModel ()
 
+let inline private decode<'a> x = x |> unbox<string> |> Thoth.Json.Decode.Auto.unsafeFromString<'a>
+let private buildWsSender (ws:WebSocket) : WsSender =
+    fun (message:WebSocketClientMessage) ->
+        let message = { Topic = ""; Ref = ""; Payload = message }
+        let message = Thoth.Json.Encode.Auto.toString(0, message)
+        ws.send message
+
+let subscription model =
+    let sub dispatch =
+        /// Handles push messages from the server and relays them into Elmish messages.
+        let onWebSocketMessage (msg:MessageEvent) =
+            let msg = msg.data |> decode<{| Payload : string |}>
+            msg.Payload
+            |> decode<WebSocketServerMessage>
+            |> ReceivedFromServer
+            |> dispatch
+
+        /// Continually tries to connect to the server websocket.
+        let rec connect () =
+            let ws = WebSocket.Create "ws://localhost:8085/channel"
+            ws.onmessage <- onWebSocketMessage
+            ws.onopen <- (fun ev ->
+                dispatch (ConnectionChanged (ConnectedToServer (buildWsSender ws)))
+                printfn "WebSocket opened")
+            ws.onclose <- (fun ev ->
+                dispatch (ConnectionChanged DisconnectedFromServer)
+                printfn "WebSocket closed. Retrying connection"
+                promise {
+                    do! Promise.sleep 2000
+                    dispatch (ConnectionChanged Connecting)
+                    connect() })
+
+        connect()
+
+    Cmd.ofSub sub
+
 let private updatePage updateFunc pageCtor msgCtor model =
     let updatedModel, updatedCmd = updateFunc
     { model with Page = pageCtor updatedModel }, Cmd.map msgCtor updatedCmd
-
-let subscription (model : Model) =
-    Cmd.batch [ Cmd.map HomeMsg (Home.Channel.subscription model) ]   
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg, model.Page with
@@ -58,6 +96,19 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         model |> updatePage (Room.Update.update msg m) Room RoomMsg
     | AboutMsg msg, About m ->
         model |> updatePage (About.Update.update msg m) About AboutMsg
+    | ConnectionChanged state, Home m ->
+        let model' = {model with ConnectionState = state}
+        model' |> updatePage (Home.Update.update (Home.ConnectionChanged state) m) Home HomeMsg 
+    | ReceivedFromServer message, Home m ->
+        match message with
+        | BroadcastMessage msg ->
+            model |> updatePage (Home.Update.update (Home.MessageReceived msg) m) Home HomeMsg 
+        | BroadcastMessages msgs ->
+            model |> updatePage (Home.Update.update (Home.MessagesReceived msgs) m) Home HomeMsg 
+    | ConnectionChanged _, _ ->
+        model, Cmd.none 
+    | ReceivedFromServer _, _ ->
+        model, Cmd.none 
     | HomeMsg _, _ ->
         model, Cmd.none
     | RoomMsg _, _ ->

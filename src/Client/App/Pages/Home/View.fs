@@ -9,6 +9,7 @@ open Feliz
 open Shared
 
 open App.Style
+open App.Channel
 open Pages.Home
 
 let private drawStatus connectionState =

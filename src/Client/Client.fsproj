@@ -9,19 +9,26 @@
     <None Include="index.html" />
     <None Include="paket.references" />
     <None Include="site.css" />
+    <!-- Common -->
     <Compile Include="App/Routing.fs" />
     <Compile Include="App/Style.fs" />
+    <Compile Include="App/Channel.fs" />
+    <!-- Components -->
     <Compile Include="App/Components/Menu.fs" />
+    <!-- Pages -->
+    <!-- Home -->
     <Compile Include="App/Pages/Home/Model.fs" />
     <Compile Include="App/Pages/Home/View.fs" />
-    <Compile Include="App/Pages/Home/Channel.fs" />
     <Compile Include="App/Pages/Home/Update.fs" />
+    <!-- Room -->
     <Compile Include="App/Pages/Room/Model.fs" />
     <Compile Include="App/Pages/Room/View.fs" />
     <Compile Include="App/Pages/Room/Update.fs" />
+    <!-- About -->
     <Compile Include="App/Pages/About/Model.fs" />
     <Compile Include="App/Pages/About/View.fs" />
     <Compile Include="App/Pages/About/Update.fs" />
+    <!-- Application -->
     <Compile Include="App/Model.fs" />
     <Compile Include="App/Update.fs" />
     <Compile Include="App/View.fs" />

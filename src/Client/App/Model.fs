@@ -2,6 +2,7 @@ module App.Model
 
 open Shared
 
+open App.Channel
 open Pages
 open App.Components.Menu
 
@@ -12,10 +13,13 @@ type Page =
     | NotFound
 
 type Model =
-    { Menu : Menu
+    { ConnectionState : ConnectionState
+      Menu : Menu
       Page : Page }
 
 type Msg =
     | HomeMsg of Home.Msg
     | RoomMsg of Room.Msg
     | AboutMsg of About.Msg
+    | ReceivedFromServer of WebSocketServerMessage
+    | ConnectionChanged of ConnectionState

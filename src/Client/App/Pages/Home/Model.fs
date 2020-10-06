@@ -1,15 +1,7 @@
 module Pages.Home
 
+open App.Channel
 open Shared
-
-type WsSender = WebSocketClientMessage -> unit
-type BroadcastMode = ViaWebSocket | ViaHTTP
-type ConnectionState =
-    | DisconnectedFromServer | ConnectedToServer of WsSender | Connecting | Reconnecting
-    member this.IsConnected =
-        match this with
-        | ConnectedToServer _ -> true
-        | DisconnectedFromServer | Connecting | Reconnecting -> false
 
 type Model =
     { MessageToSend : string
@@ -17,10 +9,11 @@ type Model =
       ConnectionState : ConnectionState }
 
 type Msg =
-    | ReceivedFromServer of WebSocketServerMessage
-    | ConnectionChange of ConnectionState
+    | ConnectionChanged of ConnectionState
     | MessageChanged of string
     | Broadcast of BroadcastMode * string
+    | MessageReceived of Message
+    | MessagesReceived of Message list
     | SyncState
 
 type ViewProps =
