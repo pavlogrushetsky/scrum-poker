@@ -7,7 +7,7 @@ open Pages
 open App.Components.Menu
 
 type Page =
-    | Login of Login.Model
+    | SignIn of SignIn.Model
     | Register of Register.Model
     | Home of Home.Model
     | Room of Room.Model
@@ -20,7 +20,7 @@ type Model =
       Page : Page }
 
 type Msg =
-    | LoginMsg of Login.Msg
+    | SignInMsg of SignIn.Msg
     | RegisterMsg of Register.Msg
     | HomeMsg of Home.Msg
     | RoomMsg of Room.Msg

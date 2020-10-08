@@ -16,14 +16,14 @@
     <!-- Components -->
     <Compile Include="App/Components/Menu.fs" />
     <!-- Pages -->
-    <!-- Login -->
-    <Compile Include="App/Pages/Login/Model.fs" />
-    <Compile Include="App/Pages/Login/View.fs" />
-    <Compile Include="App/Pages/Login/Update.fs" />
+    <!-- Sign In -->
+    <Compile Include="App/Pages/Authentication/SignIn/Model.fs" />
+    <Compile Include="App/Pages/Authentication/SignIn/View.fs" />
+    <Compile Include="App/Pages/Authentication/SignIn/Update.fs" />
     <!-- Register -->
-    <Compile Include="App/Pages/Register/Model.fs" />
-    <Compile Include="App/Pages/Register/View.fs" />
-    <Compile Include="App/Pages/Register/Update.fs" />
+    <Compile Include="App/Pages/Authentication/Register/Model.fs" />
+    <Compile Include="App/Pages/Authentication/Register/View.fs" />
+    <Compile Include="App/Pages/Authentication/Register/Update.fs" />
     <!-- Home -->
     <Compile Include="App/Pages/Home/Model.fs" />
     <Compile Include="App/Pages/Home/View.fs" />

@@ -6,14 +6,14 @@ open Browser.Types
 open Fable.Core.JsInterop
 
 type PageRoute =
-    | LoginRoute
+    | SignInRoute
     | RegisterRoute
     | HomeRoute
     | RoomRoute of roomName : string
     | AboutRoute
     | NotFoundRoute
 
-let [<Literal>] private Login = "login"
+let [<Literal>] private SignIn = "signin"
 let [<Literal>] private Register = "signup"
 let [<Literal>] private Room = "room"
 let [<Literal>] private About = "about"
@@ -23,7 +23,7 @@ let private hash = sprintf "#/%s"
 
 let routeHash = 
     function
-    | LoginRoute -> hash Login
+    | SignInRoute -> hash SignIn
     | RegisterRoute -> hash Register
     | HomeRoute -> ""
     | RoomRoute roomName -> hash (sprintf "%s/%s" Room roomName)
@@ -32,7 +32,7 @@ let routeHash =
 
 let private mapRoute : Parser<PageRoute -> PageRoute, PageRoute> =
     oneOf [
-        map LoginRoute (s Login)
+        map SignInRoute (s SignIn)
         map RegisterRoute (s Register)
         map HomeRoute top
         map RoomRoute (s Room </> str)

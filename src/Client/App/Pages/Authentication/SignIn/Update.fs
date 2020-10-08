@@ -1,11 +1,11 @@
-module Pages.Login.Update
+module Pages.SignIn.Update
 
 open Elmish
 
-open Pages.Login
+open Pages.SignIn
 
 let init () =
-    { Title = "About" }, Cmd.none
+    { Title = "SignIn" }, Cmd.none
 
 let update msg model =
     match msg with

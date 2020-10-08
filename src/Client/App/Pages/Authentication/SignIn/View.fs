@@ -1,12 +1,12 @@
-module Pages.Register.View
+module Pages.SignIn.View
 
 open Feliz
 
 open App.Style
 open App.Routing
-open Pages.Register
+open Pages.SignIn
 
-let private register' = React.functionComponent("Register", fun ({ Model = model; Dispatch = dispatch }) ->
+let private signIn' = React.functionComponent("SignIn", fun ({ Model = model; Dispatch = dispatch }) ->
     Html.main [
         prop.role "main"
         prop.className Bs.container
@@ -25,7 +25,7 @@ let private register' = React.functionComponent("Register", fun ({ Model = model
                                         prop.children [
                                             Html.h5 [
                                                 prop.className [ Bs.``card-title``; Bs.``text-center`` ]
-                                                prop.text "Sign Up"
+                                                prop.text "Sign In"
                                             ]
                                             Html.div [
                                                 prop.children [
@@ -62,21 +62,6 @@ let private register' = React.functionComponent("Register", fun ({ Model = model
                                                                 ]
                                                             ]
                                                             Html.div [
-                                                                prop.className Bs.``form-group``
-                                                                prop.children [
-                                                                    Html.label [
-                                                                        prop.htmlFor "repeatPasswordInput"
-                                                                        prop.className Bs.``bmd-label-floating``
-                                                                        prop.text "Repeat Password"
-                                                                    ]
-                                                                    Html.input [
-                                                                        prop.type' "password"
-                                                                        prop.className Bs.``form-control``
-                                                                        prop.id "repeatPasswordInput"
-                                                                    ]
-                                                                ]
-                                                            ]
-                                                            Html.div [
                                                                 prop.className [ Bs.checkbox; Bs.``my-4`` ]
                                                                 prop.children [
                                                                     Html.label [                                                                         
@@ -90,17 +75,60 @@ let private register' = React.functionComponent("Register", fun ({ Model = model
                                                                 ]
                                                             ]
                                                             Html.button [
-                                                                prop.type' "button"
                                                                 prop.className [ Bs.btn; Bs.``btn-primary``; Bs.``btn-raised``; Bs.``btn-block`` ]
-                                                                prop.text "Sign Up"
-                                                            ]  
-                                                            Html.hr []   
+                                                                prop.text "Sign In"
+                                                            ]                            
+                                                            Html.hr []
+                                                            Html.a [  
+                                                                prop.className [ Bs.btn; Bs.``btn-secondary``; Bs.``btn-raised``; Bs.``btn-block`` ]
+                                                                prop.href "#"
+                                                                prop.children [
+                                                                    Html.icon Fa.``fa-google``
+                                                                    Html.text "  Sign In with Google"
+                                                                ]
+                                                            ]
+                                                            Html.hr []
+                                                            Html.h5 [
+                                                                prop.className [ Bs.``text-center`` ]
+                                                                prop.text "- OR -"
+                                                            ]
+                                                            Html.p [
+                                                                prop.className [ Bs.``text-muted``; Bs.``text-center`` ]
+                                                                prop.text "Request access to the room by reference!"
+                                                            ]
+                                                            Html.div [
+                                                                prop.className Bs.``form-group``
+                                                                prop.children [
+                                                                    Html.label [
+                                                                        prop.htmlFor "roomReferenceInput"
+                                                                        prop.className Bs.``bmd-label-floating``
+                                                                        prop.text "Room Reference"
+                                                                    ]
+                                                                    Html.input [
+                                                                        prop.type' "text"
+                                                                        prop.className Bs.``form-control``
+                                                                        prop.id "roomReferenceInput"
+                                                                    ]
+                                                                ]
+                                                            ]
+                                                            Html.button [
+                                                                prop.type' "button"
+                                                                prop.className [ Bs.btn; Bs.``btn-secondary``; Bs.``btn-raised``; Bs.``btn-block`` ]
+                                                                prop.text "Request Access"
+                                                            ]
+                                                            Html.hr []
                                                             Html.a [
                                                                 prop.className [ Bs.btn; Bs.``btn-secondary``; Bs.``btn-block`` ]
-                                                                prop.href (routeHash LoginRoute)
+                                                                prop.href (routeHash RegisterRoute)
                                                                 prop.onClick goToUrl
-                                                                prop.text "Back to Login"
-                                                            ]                                                                                                                                                                                                     
+                                                                prop.text "Forgot Password?"
+                                                            ]
+                                                            Html.a [
+                                                                prop.className [ Bs.btn; Bs.``btn-secondary``; Bs.``btn-block`` ]
+                                                                prop.href (routeHash RegisterRoute)
+                                                                prop.onClick goToUrl
+                                                                prop.text "Create an Account"
+                                                            ]
                                                         ]
                                                     ]
                                                 ]
@@ -116,4 +144,4 @@ let private register' = React.functionComponent("Register", fun ({ Model = model
         ]
     ])
 
-let register model dispatch = register' { Model = model; Dispatch = dispatch }
+let signIn model dispatch = signIn' { Model = model; Dispatch = dispatch }

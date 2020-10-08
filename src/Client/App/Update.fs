@@ -19,10 +19,10 @@ let private notFound (model : Model) =
 
 let updateRoute (route : PageRoute option) (model : Model) =
     match route with
-    | Some LoginRoute ->
-        let model', cmd = Login.Update.init()
-        let menu = { model.Menu with CurrentRoute = LoginRoute }
-        { model with Page = Login model'; Menu = menu }, Cmd.map LoginMsg cmd
+    | Some SignInRoute ->
+        let model', cmd = SignIn.Update.init()
+        let menu = { model.Menu with CurrentRoute = SignInRoute }
+        { model with Page = SignIn model'; Menu = menu }, Cmd.map SignInMsg cmd
     | Some RegisterRoute ->
         let model', cmd = Register.Update.init()
         let menu = { model.Menu with CurrentRoute = RegisterRoute }
@@ -46,11 +46,11 @@ let updateRoute (route : PageRoute option) (model : Model) =
 
 let init page : Model * Cmd<Msg> =
     let defaultModel () =
-        let loginModel, _ = Login.Update.init ()
+        let signInModel, _ = SignIn.Update.init ()
         let model = 
             { ConnectionState = DisconnectedFromServer
-              Menu = { CurrentRoute = LoginRoute }
-              Page = Login loginModel }
+              Menu = { CurrentRoute = SignInRoute }
+              Page = SignIn signInModel }
         updateRoute page model
     defaultModel ()
 
@@ -96,8 +96,8 @@ let private updatePage updateFunc pageCtor msgCtor model =
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg, model.Page with
-    | LoginMsg msg, Login m ->
-        model |> updatePage (Login.Update.update msg m) Login LoginMsg 
+    | SignInMsg msg, SignIn m ->
+        model |> updatePage (SignIn.Update.update msg m) SignIn SignInMsg 
     | RegisterMsg msg, Register m ->
         model |> updatePage (Register.Update.update msg m) Register RegisterMsg 
     | HomeMsg msg, Home m ->
@@ -119,7 +119,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         model, Cmd.none 
     | ReceivedFromServer _, _ ->
         model, Cmd.none 
-    | LoginMsg _, _ ->
+    | SignInMsg _, _ ->
         model, Cmd.none
     | RegisterMsg _, _ ->
         model, Cmd.none

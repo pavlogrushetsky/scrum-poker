@@ -1,4 +1,4 @@
-module Pages.Login
+module Pages.SignIn
 
 type Model = 
     { Title : string }
