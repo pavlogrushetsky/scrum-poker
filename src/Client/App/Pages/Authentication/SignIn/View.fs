@@ -119,13 +119,13 @@ let private signIn' = React.functionComponent("SignIn", fun ({ Model = model; Di
                                                             Html.hr []
                                                             Html.a [
                                                                 prop.className [ Bs.btn; Bs.``btn-secondary``; Bs.``btn-block`` ]
-                                                                prop.href (routeHash RegisterRoute)
+                                                                prop.href (routeHash SignUpRoute)
                                                                 prop.onClick goToUrl
                                                                 prop.text "Forgot Password?"
                                                             ]
                                                             Html.a [
                                                                 prop.className [ Bs.btn; Bs.``btn-secondary``; Bs.``btn-block`` ]
-                                                                prop.href (routeHash RegisterRoute)
+                                                                prop.href (routeHash SignUpRoute)
                                                                 prop.onClick goToUrl
                                                                 prop.text "Create an Account"
                                                             ]

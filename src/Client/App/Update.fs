@@ -23,10 +23,10 @@ let updateRoute (route : PageRoute option) (model : Model) =
         let model', cmd = SignIn.Update.init()
         let menu = { model.Menu with CurrentRoute = SignInRoute }
         { model with Page = SignIn model'; Menu = menu }, Cmd.map SignInMsg cmd
-    | Some RegisterRoute ->
-        let model', cmd = Register.Update.init()
-        let menu = { model.Menu with CurrentRoute = RegisterRoute }
-        { model with Page = Register model'; Menu = menu }, Cmd.map RegisterMsg cmd
+    | Some SignUpRoute ->
+        let model', cmd = SignUp.Update.init()
+        let menu = { model.Menu with CurrentRoute = SignUpRoute }
+        { model with Page = SignUp model'; Menu = menu }, Cmd.map SignUpMsg cmd
     | Some HomeRoute ->
         let model', cmd = Home.Update.init model.ConnectionState
         let menu = { model.Menu with CurrentRoute = HomeRoute }
@@ -98,8 +98,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg, model.Page with
     | SignInMsg msg, SignIn m ->
         model |> updatePage (SignIn.Update.update msg m) SignIn SignInMsg 
-    | RegisterMsg msg, Register m ->
-        model |> updatePage (Register.Update.update msg m) Register RegisterMsg 
+    | SignUpMsg msg, SignUp m ->
+        model |> updatePage (SignUp.Update.update msg m) SignUp SignUpMsg 
     | HomeMsg msg, Home m ->
         model |> updatePage (Home.Update.update msg m) Home HomeMsg        
     | RoomMsg msg, Room m ->
@@ -121,7 +121,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         model, Cmd.none 
     | SignInMsg _, _ ->
         model, Cmd.none
-    | RegisterMsg _, _ ->
+    | SignUpMsg _, _ ->
         model, Cmd.none
     | HomeMsg _, _ ->
         model, Cmd.none

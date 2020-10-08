@@ -9,7 +9,7 @@ open App.Components.Menu
 open App.Model
 
 open Pages.SignIn.View
-open Pages.Register.View
+open Pages.SignUp.View
 open Pages.Home.View
 open Pages.Room.View
 open Pages.About.View
@@ -18,8 +18,8 @@ let private renderPage dispatch page =
     match page with
     | SignIn model ->
         signIn model (SignInMsg >> dispatch)
-    | Register model ->
-        register model (RegisterMsg >> dispatch)
+    | SignUp model ->
+        signUp model (SignUpMsg >> dispatch)
     | Home model ->
         home model (HomeMsg >> dispatch)
     | Room model ->
@@ -62,7 +62,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
         match model.Page with
         | SignIn _ ->
             ignore ()
-        | Register _ ->
+        | SignUp _ ->
             ignore ()
         | _ ->
             menu HomeRoute
@@ -72,7 +72,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
         match model.Page with
         | SignIn _ ->
             ignore ()
-        | Register _ ->
+        | SignUp _ ->
             ignore ()
         | _ ->
             footer     

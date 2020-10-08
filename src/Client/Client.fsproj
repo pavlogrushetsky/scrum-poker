@@ -20,10 +20,10 @@
     <Compile Include="App/Pages/Authentication/SignIn/Model.fs" />
     <Compile Include="App/Pages/Authentication/SignIn/View.fs" />
     <Compile Include="App/Pages/Authentication/SignIn/Update.fs" />
-    <!-- Register -->
-    <Compile Include="App/Pages/Authentication/Register/Model.fs" />
-    <Compile Include="App/Pages/Authentication/Register/View.fs" />
-    <Compile Include="App/Pages/Authentication/Register/Update.fs" />
+    <!-- Sign Up -->
+    <Compile Include="App/Pages/Authentication/SignUp/Model.fs" />
+    <Compile Include="App/Pages/Authentication/SignUp/View.fs" />
+    <Compile Include="App/Pages/Authentication/SignUp/Update.fs" />
     <!-- Home -->
     <Compile Include="App/Pages/Home/Model.fs" />
     <Compile Include="App/Pages/Home/View.fs" />

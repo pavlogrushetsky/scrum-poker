@@ -1,4 +1,4 @@
-module Pages.Register
+module Pages.SignUp
 
 type Model = 
     { Title : string }

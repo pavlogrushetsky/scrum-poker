@@ -1,12 +1,12 @@
-module Pages.Register.View
+module Pages.SignUp.View
 
 open Feliz
 
 open App.Style
 open App.Routing
-open Pages.Register
+open Pages.SignUp
 
-let private register' = React.functionComponent("Register", fun ({ Model = model; Dispatch = dispatch }) ->
+let private signUp' = React.functionComponent("Sign Up", fun ({ Model = model; Dispatch = dispatch }) ->
     Html.main [
         prop.role "main"
         prop.className Bs.container
@@ -116,4 +116,4 @@ let private register' = React.functionComponent("Register", fun ({ Model = model
         ]
     ])
 
-let register model dispatch = register' { Model = model; Dispatch = dispatch }
+let signUp model dispatch = signUp' { Model = model; Dispatch = dispatch }
