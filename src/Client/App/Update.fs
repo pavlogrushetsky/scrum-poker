@@ -3,7 +3,6 @@ module App.Update
 open Elmish
 open Elmish.Navigation
 open Fable.Import
-open Thoth.Fetch
 open Browser.Types
 open Browser.WebSocket
 
@@ -20,6 +19,10 @@ let private notFound (model : Model) =
 
 let updateRoute (route : PageRoute option) (model : Model) =
     match route with
+    | Some LoginRoute ->
+        let model', cmd = Login.Update.init()
+        let menu = { model.Menu with CurrentRoute = LoginRoute }
+        { model with Page = Login model'; Menu = menu }, Cmd.map LoginMsg cmd
     | Some HomeRoute ->
         let model', cmd = Home.Update.init model.ConnectionState
         let menu = { model.Menu with CurrentRoute = HomeRoute }
@@ -39,12 +42,11 @@ let updateRoute (route : PageRoute option) (model : Model) =
 
 let init page : Model * Cmd<Msg> =
     let defaultModel () =
-        let connectionState = DisconnectedFromServer
-        let homeModel, _ = Home.Update.init connectionState
+        let loginModel, _ = Login.Update.init ()
         let model = 
             { ConnectionState = DisconnectedFromServer
-              Menu = { CurrentRoute = HomeRoute }
-              Page = Home homeModel }
+              Menu = { CurrentRoute = LoginRoute }
+              Page = Login loginModel }
         updateRoute page model
     defaultModel ()
 
@@ -90,6 +92,8 @@ let private updatePage updateFunc pageCtor msgCtor model =
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg, model.Page with
+    | LoginMsg msg, Login m ->
+        model |> updatePage (Login.Update.update msg m) Login LoginMsg 
     | HomeMsg msg, Home m ->
         model |> updatePage (Home.Update.update msg m) Home HomeMsg        
     | RoomMsg msg, Room m ->
@@ -109,6 +113,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         model, Cmd.none 
     | ReceivedFromServer _, _ ->
         model, Cmd.none 
+    | LoginMsg _, _ ->
+        model, Cmd.none
     | HomeMsg _, _ ->
         model, Cmd.none
     | RoomMsg _, _ ->

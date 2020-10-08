@@ -16,6 +16,10 @@
     <!-- Components -->
     <Compile Include="App/Components/Menu.fs" />
     <!-- Pages -->
+    <!-- Login -->
+    <Compile Include="App/Pages/Login/Model.fs" />
+    <Compile Include="App/Pages/Login/View.fs" />
+    <Compile Include="App/Pages/Login/Update.fs" />
     <!-- Home -->
     <Compile Include="App/Pages/Home/Model.fs" />
     <Compile Include="App/Pages/Home/View.fs" />

@@ -1,7 +1,5 @@
 module Pages.Room.View
 
-open Fable.React
-open Fable.React.Props
 open Feliz
 
 open Pages.Room

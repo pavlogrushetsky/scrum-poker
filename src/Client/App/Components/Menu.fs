@@ -50,10 +50,10 @@ let private menu' = React.functionComponent("Menu", fun (props : Menu) ->
                             ]
                             Html.ul [
                                 prop.className [ Bs.``navbar-nav``; Bs.``mr-md-2`` ]
-                                prop.children [
+                                prop.children [                                    
                                     Html.li [
                                         prop.className Bs.``nav-item``
-                                        prop.children [
+                                        prop.children [                                           
                                             Html.a [
                                                 prop.className Bs.``nav-link``
                                                 prop.href "https://github.com/pavlogrushetsky/scrum-poker"
@@ -64,6 +64,7 @@ let private menu' = React.functionComponent("Menu", fun (props : Menu) ->
                                             ]
                                         ]
                                     ]
+                                    Html.route "Login" "" LoginRoute props.CurrentRoute
                                 ]
                             ]
                         ]
