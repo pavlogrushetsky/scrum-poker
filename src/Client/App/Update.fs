@@ -23,6 +23,10 @@ let updateRoute (route : PageRoute option) (model : Model) =
         let model', cmd = Login.Update.init()
         let menu = { model.Menu with CurrentRoute = LoginRoute }
         { model with Page = Login model'; Menu = menu }, Cmd.map LoginMsg cmd
+    | Some RegisterRoute ->
+        let model', cmd = Register.Update.init()
+        let menu = { model.Menu with CurrentRoute = RegisterRoute }
+        { model with Page = Register model'; Menu = menu }, Cmd.map RegisterMsg cmd
     | Some HomeRoute ->
         let model', cmd = Home.Update.init model.ConnectionState
         let menu = { model.Menu with CurrentRoute = HomeRoute }
@@ -94,6 +98,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg, model.Page with
     | LoginMsg msg, Login m ->
         model |> updatePage (Login.Update.update msg m) Login LoginMsg 
+    | RegisterMsg msg, Register m ->
+        model |> updatePage (Register.Update.update msg m) Register RegisterMsg 
     | HomeMsg msg, Home m ->
         model |> updatePage (Home.Update.update msg m) Home HomeMsg        
     | RoomMsg msg, Room m ->
@@ -114,6 +120,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     | ReceivedFromServer _, _ ->
         model, Cmd.none 
     | LoginMsg _, _ ->
+        model, Cmd.none
+    | RegisterMsg _, _ ->
         model, Cmd.none
     | HomeMsg _, _ ->
         model, Cmd.none

@@ -20,6 +20,10 @@
     <Compile Include="App/Pages/Login/Model.fs" />
     <Compile Include="App/Pages/Login/View.fs" />
     <Compile Include="App/Pages/Login/Update.fs" />
+    <!-- Register -->
+    <Compile Include="App/Pages/Register/Model.fs" />
+    <Compile Include="App/Pages/Register/View.fs" />
+    <Compile Include="App/Pages/Register/Update.fs" />
     <!-- Home -->
     <Compile Include="App/Pages/Home/Model.fs" />
     <Compile Include="App/Pages/Home/View.fs" />

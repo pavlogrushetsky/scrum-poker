@@ -1,12 +1,7 @@
 module App.View
 
-open System
-
 open Fable.React
-open Fable.React.Props
 open Feliz
-
-open Shared
 
 open App.Style
 open App.Routing
@@ -14,6 +9,7 @@ open App.Components.Menu
 open App.Model
 
 open Pages.Login.View
+open Pages.Register.View
 open Pages.Home.View
 open Pages.Room.View
 open Pages.About.View
@@ -22,6 +18,8 @@ let private renderPage dispatch page =
     match page with
     | Login model ->
         login model (LoginMsg >> dispatch)
+    | Register model ->
+        register model (RegisterMsg >> dispatch)
     | Home model ->
         home model (HomeMsg >> dispatch)
     | Room model ->
@@ -64,6 +62,8 @@ let view (model : Model) (dispatch : Msg -> unit) =
         match model.Page with
         | Login _ ->
             ignore ()
+        | Register _ ->
+            ignore ()
         | _ ->
             menu HomeRoute
 
@@ -71,6 +71,8 @@ let view (model : Model) (dispatch : Msg -> unit) =
 
         match model.Page with
         | Login _ ->
+            ignore ()
+        | Register _ ->
             ignore ()
         | _ ->
             footer     
