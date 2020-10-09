@@ -65,6 +65,7 @@ let private menu' = React.functionComponent("Menu", fun (props : Menu) ->
                                         ]
                                     ]
                                     Html.route "Sign In" "" SignInRoute props.CurrentRoute
+                                    Html.route "Join Room" "" JoinRoute props.CurrentRoute
                                     Html.route "Sign Up" "" SignUpRoute props.CurrentRoute
                                 ]
                             ]

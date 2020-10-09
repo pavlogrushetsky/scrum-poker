@@ -1,12 +1,12 @@
-module Pages.Join.View
+module Pages.ResetPassword.View
 
 open Feliz
 
 open App.Style
 open App.Routing
-open Pages.Join
+open Pages.ResetPassword
 
-let private join' = React.functionComponent("Join", fun ({ Model = model; Dispatch = dispatch }) ->
+let private resetPassword' = React.functionComponent("ResetPassword", fun ({ Model = model; Dispatch = dispatch }) ->
     Html.main [
         prop.role "main"
         prop.className Bs.container
@@ -25,7 +25,7 @@ let private join' = React.functionComponent("Join", fun ({ Model = model; Dispat
                                         prop.children [
                                             Html.h5 [
                                                 prop.className [ Bs.``card-title``; Bs.``text-center`` ]
-                                                prop.text "Join the Room"
+                                                prop.text "Reset Password"
                                             ]
                                             Html.div [
                                                 prop.children [
@@ -35,14 +35,14 @@ let private join' = React.functionComponent("Join", fun ({ Model = model; Dispat
                                                                 prop.className Bs.``form-group``
                                                                 prop.children [
                                                                     Html.label [
-                                                                        prop.htmlFor "nameInput"
+                                                                        prop.htmlFor "oldPasswordInput"
                                                                         prop.className Bs.``bmd-label-floating``
-                                                                        prop.text "Name"
+                                                                        prop.text "Current Password"
                                                                     ]
                                                                     Html.input [
-                                                                        prop.type' "text"
+                                                                        prop.type' "password"
                                                                         prop.className Bs.``form-control``
-                                                                        prop.id "nameInput"
+                                                                        prop.id "oldPasswordInput"
                                                                     ]
                                                                 ]
                                                             ]
@@ -50,26 +50,41 @@ let private join' = React.functionComponent("Join", fun ({ Model = model; Dispat
                                                                 prop.className Bs.``form-group``
                                                                 prop.children [
                                                                     Html.label [
-                                                                        prop.htmlFor "referenceInput"
+                                                                        prop.htmlFor "newPasswordInput"
                                                                         prop.className Bs.``bmd-label-floating``
-                                                                        prop.text "Room Reference"
+                                                                        prop.text "New Password"
                                                                     ]
                                                                     Html.input [
-                                                                        prop.type' "text"
+                                                                        prop.type' "password"
                                                                         prop.className Bs.``form-control``
-                                                                        prop.id "referenceInput"
+                                                                        prop.id "newPasswordInput"
+                                                                    ]
+                                                                ]
+                                                            ]
+                                                            Html.div [
+                                                                prop.className Bs.``form-group``
+                                                                prop.children [
+                                                                    Html.label [
+                                                                        prop.htmlFor "repeatPasswordInput"
+                                                                        prop.className Bs.``bmd-label-floating``
+                                                                        prop.text "Repeat New Password"
+                                                                    ]
+                                                                    Html.input [
+                                                                        prop.type' "password"
+                                                                        prop.className Bs.``form-control``
+                                                                        prop.id "repeatPasswordInput"
                                                                     ]
                                                                 ]
                                                             ]
                                                             Html.button [
                                                                 prop.className [ Bs.btn; Bs.``btn-primary``; Bs.``btn-raised``; Bs.``btn-block`` ]
-                                                                prop.text "Request Access"
+                                                                prop.text "Reset Password"
                                                             ]    
                                                             Html.hr []   
                                                             Html.a [
                                                                 prop.className [ Bs.btn; Bs.``btn-secondary``; Bs.``btn-block`` ]
-                                                                prop.href (routeHash SignInRoute)
-                                                                prop.onClick goToUrl
+                                                                // prop.href (routeHash SignInRoute)
+                                                                // prop.onClick goToUrl
                                                                 prop.text "Back"
                                                             ]                                                                                                                                                                                                         
                                                         ]
@@ -87,4 +102,4 @@ let private join' = React.functionComponent("Join", fun ({ Model = model; Dispat
         ]
     ])
 
-let join model dispatch = join' { Model = model; Dispatch = dispatch }
+let resetPassword model dispatch = resetPassword' { Model = model; Dispatch = dispatch }

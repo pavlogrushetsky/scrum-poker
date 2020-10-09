@@ -11,6 +11,7 @@ open App.Model
 open Pages.SignIn.View
 open Pages.SignUp.View
 open Pages.Join.View
+open Pages.ResetPassword.View
 open Pages.Home.View
 open Pages.Room.View
 open Pages.About.View
@@ -23,6 +24,8 @@ let private renderPage dispatch page =
         signUp model (SignUpMsg >> dispatch)
     | Join model ->
         join model (JoinMsg >> dispatch)
+    | ResetPassword model ->
+        resetPassword model (ResetPasswordMsg >> dispatch)
     | Home model ->
         home model (HomeMsg >> dispatch)
     | Room model ->
