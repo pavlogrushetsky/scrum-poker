@@ -24,6 +24,10 @@
     <Compile Include="App/Pages/Authentication/SignUp/Model.fs" />
     <Compile Include="App/Pages/Authentication/SignUp/View.fs" />
     <Compile Include="App/Pages/Authentication/SignUp/Update.fs" />
+    <!-- Join -->
+    <Compile Include="App/Pages/Authentication/Join/Model.fs" />
+    <Compile Include="App/Pages/Authentication/Join/View.fs" />
+    <Compile Include="App/Pages/Authentication/Join/Update.fs" />
     <!-- Home -->
     <Compile Include="App/Pages/Home/Model.fs" />
     <Compile Include="App/Pages/Home/View.fs" />

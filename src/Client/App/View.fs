@@ -10,6 +10,7 @@ open App.Model
 
 open Pages.SignIn.View
 open Pages.SignUp.View
+open Pages.Join.View
 open Pages.Home.View
 open Pages.Room.View
 open Pages.About.View
@@ -20,6 +21,8 @@ let private renderPage dispatch page =
         signIn model (SignInMsg >> dispatch)
     | SignUp model ->
         signUp model (SignUpMsg >> dispatch)
+    | Join model ->
+        join model (JoinMsg >> dispatch)
     | Home model ->
         home model (HomeMsg >> dispatch)
     | Room model ->
@@ -60,9 +63,7 @@ let private footer =
 let view (model : Model) (dispatch : Msg -> unit) =
     div [] [
         match model.Page with
-        | SignIn _ ->
-            ignore ()
-        | SignUp _ ->
+        | SignIn _ | SignUp _ | Join _ ->
             ignore ()
         | _ ->
             menu HomeRoute
@@ -70,9 +71,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
         renderPage dispatch model.Page
 
         match model.Page with
-        | SignIn _ ->
-            ignore ()
-        | SignUp _ ->
+        | SignIn _ | SignUp _ | Join _ ->
             ignore ()
         | _ ->
             footer     

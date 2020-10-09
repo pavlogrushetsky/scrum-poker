@@ -92,29 +92,11 @@ let private signIn' = React.functionComponent("SignIn", fun ({ Model = model; Di
                                                                 prop.className [ Bs.``text-center`` ]
                                                                 prop.text "- OR -"
                                                             ]
-                                                            Html.p [
-                                                                prop.className [ Bs.``text-muted``; Bs.``text-center`` ]
-                                                                prop.text "Request access to the room by reference!"
-                                                            ]
-                                                            Html.div [
-                                                                prop.className Bs.``form-group``
-                                                                prop.children [
-                                                                    Html.label [
-                                                                        prop.htmlFor "roomReferenceInput"
-                                                                        prop.className Bs.``bmd-label-floating``
-                                                                        prop.text "Room Reference"
-                                                                    ]
-                                                                    Html.input [
-                                                                        prop.type' "text"
-                                                                        prop.className Bs.``form-control``
-                                                                        prop.id "roomReferenceInput"
-                                                                    ]
-                                                                ]
-                                                            ]
-                                                            Html.button [
-                                                                prop.type' "button"
+                                                            Html.a [
                                                                 prop.className [ Bs.btn; Bs.``btn-secondary``; Bs.``btn-raised``; Bs.``btn-block`` ]
-                                                                prop.text "Request Access"
+                                                                prop.href (routeHash JoinRoute)
+                                                                prop.onClick goToUrl
+                                                                prop.text "Join the Room"
                                                             ]
                                                             Html.hr []
                                                             Html.a [

@@ -27,6 +27,10 @@ let updateRoute (route : PageRoute option) (model : Model) =
         let model', cmd = SignUp.Update.init()
         let menu = { model.Menu with CurrentRoute = SignUpRoute }
         { model with Page = SignUp model'; Menu = menu }, Cmd.map SignUpMsg cmd
+    | Some JoinRoute ->
+        let model', cmd = Join.Update.init()
+        let menu = { model.Menu with CurrentRoute = JoinRoute }
+        { model with Page = Join model'; Menu = menu }, Cmd.map JoinMsg cmd
     | Some HomeRoute ->
         let model', cmd = Home.Update.init model.ConnectionState
         let menu = { model.Menu with CurrentRoute = HomeRoute }
@@ -100,6 +104,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         model |> updatePage (SignIn.Update.update msg m) SignIn SignInMsg 
     | SignUpMsg msg, SignUp m ->
         model |> updatePage (SignUp.Update.update msg m) SignUp SignUpMsg 
+    | JoinMsg msg, Join m ->
+        model |> updatePage (Join.Update.update msg m) Join JoinMsg 
     | HomeMsg msg, Home m ->
         model |> updatePage (Home.Update.update msg m) Home HomeMsg        
     | RoomMsg msg, Room m ->
@@ -122,6 +128,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     | SignInMsg _, _ ->
         model, Cmd.none
     | SignUpMsg _, _ ->
+        model, Cmd.none
+    | JoinMsg _, _ ->
         model, Cmd.none
     | HomeMsg _, _ ->
         model, Cmd.none
