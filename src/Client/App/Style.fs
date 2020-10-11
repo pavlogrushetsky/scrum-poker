@@ -7,6 +7,8 @@ open App.Routing
 
 type Bs = CssClasses<"https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css", Naming.Verbatim>     
 
+type Sem = CssClasses<"https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css", Naming.Verbatim>  
+
 type Fa = CssClasses<"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css", Naming.Verbatim>
 
 type prop with
