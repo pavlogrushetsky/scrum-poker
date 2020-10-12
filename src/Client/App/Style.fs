@@ -15,6 +15,7 @@ type prop with
     static member dataToggle value = prop.custom ("data-toggle", value) 
     static member dataTarget value = prop.custom ("data-target", value)
     static member scope value = prop.custom ("scope", value)
+    static member dataText value = prop.custom ("data-text", value)
 
 type Html with
     static member route (name : string) icon target current =

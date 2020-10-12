@@ -1,4 +1,4 @@
-module App.Components.SignUpForm
+module App.Components.SignInForm
 
 open Feliz
 open Feliz.UseDeferred
@@ -6,29 +6,27 @@ open Feliz.UseDeferred
 open App.Style
 open App.Routing
 
-let private signUp firstName lastName email password = async {
+let private signIn email password = async {
     do! Async.Sleep 5000
-    if firstName = "admin" && email = "admin@test.com" && password = "admin"
+    if email = "admin@test.com" && password = "admin"
     then return Ok "admin"
     else return Error "Credentials incorrect"
 }
 
-let signUpForm = React.functionComponent("SignUpForm", fun () ->
-    let (signupState, setSignUpState) = React.useState(Deferred.HasNotStartedYet)
-    let firstNameRef = React.useInputRef()
-    let lastNameRef = React.useInputRef()
+let signInForm = React.functionComponent("SignInForm", fun () ->
+    let (signInState, setSignInState) = React.useState(Deferred.HasNotStartedYet)  
     let emailRef = React.useInputRef()
     let passwordRef = React.useInputRef()
 
-    let signUp() =
-        match firstNameRef.current, lastNameRef.current, emailRef.current, passwordRef.current with
-        | Some firstName, Some lastName, Some email, Some password -> signUp firstName.value lastName.value email.value password.value
+    let signIn() =
+        match emailRef.current, passwordRef.current with
+        | Some email, Some password -> signIn email.value password.value
         | _ -> failwith "Component hasn't been initialized"
 
-    let startSignUp = React.useDeferredCallback(signUp, setSignUpState)
+    let startSignIn = React.useDeferredCallback(signIn, setSignInState)
 
     let message =
-        match signupState with
+        match signInState with
         | Deferred.HasNotStartedYet -> Html.none
         | Deferred.InProgress -> Html.none
         | Deferred.Failed error ->
@@ -49,7 +47,7 @@ let signUpForm = React.functionComponent("SignUpForm", fun () ->
                     Html.i [
                         prop.className [ Sem.icon; Sem.check; Sem.circle ]
                     ]
-                    Html.text (sprintf "User %s signed up" user)
+                    Html.text (sprintf "User %s signed in" user)
                 ]
             ]
 
@@ -60,7 +58,7 @@ let signUpForm = React.functionComponent("SignUpForm", fun () ->
                     Html.i [
                         prop.className [ Sem.icon; Sem.user; Sem.times ]
                     ]
-                    Html.text (sprintf "Sign up error: %s" error)
+                    Html.text (sprintf "Sign in error: %s" error)
                 ]
             ]
 
@@ -72,44 +70,15 @@ let signUpForm = React.functionComponent("SignUpForm", fun () ->
                 prop.children [
                     Html.div [
                         prop.className Sem.header
-                        prop.text "Sign up to Scrum Poker!"
+                        prop.text "Sign in to Scrum Poker!"
                     ]
-                    Html.p [ prop.text "Fill out the form below to sign up for a new account" ]
+                    Html.p [ prop.text "Fill out the form below to sign into your account" ]
                 ]
             ]
             message
             Html.form [
                 prop.className [ Sem.ui; Sem.form; Sem.attached; Sem.fluid; Sem.segment ]
                 prop.children [
-                    Html.div [
-                        prop.className [ Sem.two; Sem.fields ]
-                        prop.children [
-                            Html.div [
-                                prop.className [ Sem.field ]
-                                prop.children [
-                                    Html.label [ prop.text "First Name" ]
-                                    Html.input [
-                                        prop.placeholder "First Name"
-                                        prop.type' "text"
-                                        prop.ref firstNameRef
-                                        prop.disabled (Deferred.inProgress signupState)
-                                    ]
-                                ]                    
-                            ]
-                            Html.div [
-                                prop.className Sem.field
-                                prop.children [
-                                    Html.label [ prop.text "Last Name" ]
-                                    Html.input [
-                                        prop.placeholder "Last Name"
-                                        prop.type' "text"
-                                        prop.ref lastNameRef
-                                        prop.disabled (Deferred.inProgress signupState)
-                                    ]
-                                ]                    
-                            ]
-                        ]
-                    ]
                     Html.div [
                         prop.className Sem.field
                         prop.children [
@@ -118,7 +87,7 @@ let signUpForm = React.functionComponent("SignUpForm", fun () ->
                                 prop.placeholder "Email Address"
                                 prop.type' "email"
                                 prop.ref emailRef
-                                prop.disabled (Deferred.inProgress signupState)
+                                prop.disabled (Deferred.inProgress signInState)
                             ]
                         ]
                     ]
@@ -130,7 +99,7 @@ let signUpForm = React.functionComponent("SignUpForm", fun () ->
                                 prop.placeholder "Password"
                                 prop.type' "password"
                                 prop.ref passwordRef
-                                prop.disabled (Deferred.inProgress signupState)
+                                prop.disabled (Deferred.inProgress signInState)
                             ]
                         ]
                     ]
@@ -143,7 +112,7 @@ let signUpForm = React.functionComponent("SignUpForm", fun () ->
                                     Html.input [
                                         prop.type' "checkbox"
                                         prop.id "rememberMe"
-                                        prop.disabled (Deferred.inProgress signupState)
+                                        prop.disabled (Deferred.inProgress signInState)
                                     ]
                                     Html.label [
                                         prop.htmlFor "rememberMe"
@@ -160,12 +129,12 @@ let signUpForm = React.functionComponent("SignUpForm", fun () ->
                             Sem.fluid
                             "submit" 
                             Sem.button 
-                            if Deferred.inProgress signupState 
+                            if Deferred.inProgress signInState 
                             then Sem.loading
                         ]
-                        prop.text "Sign Up"
-                        prop.disabled (Deferred.inProgress signupState)
-                        prop.onClick(fun _ -> startSignUp())
+                        prop.text "Sign In"
+                        prop.disabled (Deferred.inProgress signInState)
+                        prop.onClick(fun _ -> startSignIn())
                     ]
                     Html.div [
                         prop.className [ Sem.ui; Sem.horizontal; Sem.divider ]
@@ -179,25 +148,46 @@ let signUpForm = React.functionComponent("SignUpForm", fun () ->
                             Sem.plus
                             Sem.button 
                         ]
-                        prop.disabled (Deferred.inProgress signupState)
+                        prop.disabled (Deferred.inProgress signInState)
                         prop.children [
                             Html.i [
                                 prop.className [ Sem.icon; Sem.google; Sem.plus ]
                             ]
-                            Html.text "Sign Up with Google"
+                            Html.text "Sign In with Google"
                         ]
+                    ] 
+                    Html.div [
+                        prop.className [ Sem.ui; Sem.horizontal; Sem.divider ]
+                        prop.text "Or"
                     ]
+                    Html.a [
+                        prop.className [ Sem.ui; Sem.button; Sem.grey; Sem.fluid ]
+                        prop.href (routeHash JoinRoute)
+                        prop.onClick goToUrl
+                        prop.text "Join the Room"
+                        prop.disabled (Deferred.inProgress signInState)
+                    ]  
                     Html.div [
                         prop.className [ Sem.ui; Sem.divider ]
                     ]
                     Html.a [
-                        prop.className [ Sem.ui; Sem.fluid; Sem.button ]
-                        prop.href (routeHash SignInRoute)
+                        prop.className [ Sem.ui; Sem.button; Sem.fluid ]
+                        prop.href (routeHash ResetPasswordRoute)
                         prop.onClick goToUrl
-                        prop.text "Back to Sign In"
-                        prop.disabled (Deferred.inProgress signupState)
+                        prop.text "Forgot Password?"
+                        prop.disabled (Deferred.inProgress signInState)
+                    ]  
+                    Html.div [
+                        prop.className [ Sem.ui; Sem.hidden; Sem.divider ]
+                    ]
+                    Html.a [
+                        prop.className [ Sem.ui; Sem.button; Sem.fluid ]
+                        prop.href (routeHash SignUpRoute)
+                        prop.onClick goToUrl
+                        prop.text "Create an Account"
+                        prop.disabled (Deferred.inProgress signInState)
                     ]   
                 ]        
-            ]          
+            ]                        
         ]
     ])
