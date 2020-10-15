@@ -11,7 +11,7 @@ type PageRoute =
     | JoinRoute
     | ResetPasswordRoute
     | HomeRoute
-    | RoomRoute of roomName : string
+    | RoomRoute of room : string
     | AboutRoute
     | NotFoundRoute
 
@@ -32,7 +32,7 @@ let routeHash =
     | JoinRoute -> hash Join
     | ResetPasswordRoute -> hash ResetPassword
     | HomeRoute -> ""
-    | RoomRoute roomName -> hash (sprintf "%s/%s" Room roomName)
+    | RoomRoute room -> hash (sprintf "%s/%s" Room room)
     | AboutRoute -> hash About
     | NotFoundRoute -> hash NotFound
 

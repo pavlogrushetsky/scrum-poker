@@ -10,64 +10,75 @@ type Menu = {
     CurrentRoute : PageRoute
 }
 
-let private menu' = React.functionComponent("Menu", fun (props : Menu) ->
-    Html.nav [
-        prop.className [ Bs.navbar; Bs.``navbar-expand-lg``; Bs.``navbar-dark``; Bs.``bg-primary``; Bs.``fixed-top`` ]
+let private menu' = React.functionComponent("Menu", fun (props : Menu) ->      
+    Html.div [
+        prop.className [ Sem.ui; "fixed"; Sem.inverted; Sem.menu ]
         prop.children [
             Html.div [
-                prop.className Bs.container
+                prop.className [ Sem.ui; Sem.container ]
                 prop.children [
                     Html.a [
-                        prop.className Bs.``navbar-brand``
+                        prop.className [ Sem.header; Sem.item ]
                         prop.href ""
                         prop.text "Scrum Poker"
                     ]
-                    Html.button [
-                        prop.className Bs.``navbar-toggler``
-                        prop.type' "button"
-                        prop.dataToggle "collapse"
-                        prop.dataTarget "#navbarNavDropdown"
-                        prop.ariaControls "navbarNavDropdown"
-                        prop.ariaExpanded false
-                        prop.ariaLabel "Toggle navigation"
-                        prop.children [
-                            Html.span [
-                                prop.className Bs.``navbar-toggler-icon``
-                            ]
+                    Html.a [
+                        prop.className [ 
+                            Sem.blue 
+                            Sem.item 
+                            if props.CurrentRoute = HomeRoute
+                            then Sem.active
                         ]
+                        prop.text "Home"
+                        prop.href (routeHash HomeRoute)
+                        prop.onClick goToUrl
+                    ]
+                    Html.a [
+                        prop.className [ 
+                            Sem.item 
+                            Sem.green 
+                            if props.CurrentRoute = (RoomRoute "1")
+                            then Sem.active
+                        ]
+                        prop.text "Room"
+                        prop.href (routeHash (RoomRoute "1"))
+                        prop.onClick goToUrl
+                    ]
+                    Html.a [
+                        prop.className [ 
+                            Sem.item 
+                            Sem.teal 
+                            if props.CurrentRoute = AboutRoute
+                            then Sem.active
+                        ]
+                        prop.text "About"
+                        prop.href (routeHash AboutRoute)
+                        prop.onClick goToUrl
                     ]
                     Html.div [
-                        prop.className [ Bs.collapse; Bs.``navbar-collapse`` ]
-                        prop.id "navbarNavDropdown"
+                        prop.className [ Sem.right; Sem.menu ]
                         prop.children [
-                            Html.ul [
-                                prop.className [ Bs.``navbar-nav``; Bs.``mr-auto`` ]
+                            Html.a [
+                                prop.className [ Sem.item ]
+                                prop.href "https://github.com/pavlogrushetsky/scrum-poker"
+                                prop.target "_blank"
                                 prop.children [
-                                    Html.route "Home" "" HomeRoute props.CurrentRoute
-                                    Html.route "Room #1" "" (RoomRoute "Room #1") props.CurrentRoute
-                                    Html.route "About" "" AboutRoute props.CurrentRoute
+                                    Html.i [
+                                        prop.className [ Sem.github; Sem.icon ]
+                                    ]
                                 ]
                             ]
-                            Html.ul [
-                                prop.className [ Bs.``navbar-nav``; Bs.``mr-md-2`` ]
-                                prop.children [                                    
-                                    Html.li [
-                                        prop.className Bs.``nav-item``
-                                        prop.children [                                           
-                                            Html.a [
-                                                prop.className Bs.``nav-link``
-                                                prop.href "https://github.com/pavlogrushetsky/scrum-poker"
-                                                prop.target "_blank"
-                                                prop.children [
-                                                    Html.icon Fa.``fa-github``
-                                                ]
-                                            ]
-                                        ]
-                                    ]
-                                    Html.route "Sign In" "" SignInRoute props.CurrentRoute
-                                    Html.route "Join Room" "" JoinRoute props.CurrentRoute
-                                    Html.route "Sign Up" "" SignUpRoute props.CurrentRoute
-                                ]
+                            Html.a [
+                                prop.className [ Sem.item ]
+                                prop.text "Sign In"
+                                prop.href (routeHash SignInRoute)
+                                prop.onClick goToUrl
+                            ]
+                            Html.a [
+                                prop.className [ Sem.item ]
+                                prop.text "Sign Up"
+                                prop.href (routeHash SignUpRoute)
+                                prop.onClick goToUrl
                             ]
                         ]
                     ]

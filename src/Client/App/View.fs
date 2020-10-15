@@ -63,13 +63,13 @@ let private footer =
         ]
     ]   
 
-let view (model : Model) (dispatch : Msg -> unit) =
+let view (model : Model) (dispatch : Msg -> unit) =          
     div [] [
         match model.Page with
         | SignIn _ | SignUp _ | Join _ ->
             ignore ()
         | _ ->
-            menu HomeRoute
+            menu model.Menu.CurrentRoute
 
         renderPage dispatch model.Page
 
