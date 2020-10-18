@@ -1,4 +1,4 @@
-module Pages.ResetPassword
+module Pages.RecoverPassword
 
 type Model = 
     { Title : string }

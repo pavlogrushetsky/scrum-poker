@@ -9,7 +9,7 @@ type PageRoute =
     | SignInRoute
     | SignUpRoute
     | JoinRoute
-    | ResetPasswordRoute
+    | RecoverPasswordRoute
     | HomeRoute
     | RoomRoute of room : string
     | AboutRoute
@@ -18,7 +18,7 @@ type PageRoute =
 let [<Literal>] private SignIn = "signin"
 let [<Literal>] private SignUp = "signup"
 let [<Literal>] private Join = "join"
-let [<Literal>] private ResetPassword = "resetpassword"
+let [<Literal>] private RecoverPassword = "recoverpassword"
 let [<Literal>] private Room = "room"
 let [<Literal>] private About = "about"
 let [<Literal>] private NotFound = "notfound"
@@ -30,7 +30,7 @@ let routeHash =
     | SignInRoute -> hash SignIn
     | SignUpRoute -> hash SignUp
     | JoinRoute -> hash Join
-    | ResetPasswordRoute -> hash ResetPassword
+    | RecoverPasswordRoute -> hash RecoverPassword
     | HomeRoute -> ""
     | RoomRoute room -> hash (sprintf "%s/%s" Room room)
     | AboutRoute -> hash About
@@ -41,7 +41,7 @@ let private mapRoute : Parser<PageRoute -> PageRoute, PageRoute> =
         map SignInRoute (s SignIn)
         map SignUpRoute (s SignUp)
         map JoinRoute (s Join)
-        map ResetPasswordRoute (s ResetPassword)
+        map RecoverPasswordRoute (s RecoverPassword)
         map HomeRoute top
         map RoomRoute (s Room </> str)
         map AboutRoute (s About)

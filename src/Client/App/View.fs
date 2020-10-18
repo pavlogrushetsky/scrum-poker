@@ -10,7 +10,7 @@ open App.Model
 open Pages.SignIn.View
 open Pages.SignUp.View
 open Pages.Join.View
-open Pages.ResetPassword.View
+open Pages.RecoverPassword.View
 open Pages.Home.View
 open Pages.Room.View
 open Pages.About.View
@@ -23,8 +23,8 @@ let private renderPage dispatch page =
         signUp ()
     | Join model ->
         join ()
-    | ResetPassword model ->
-        resetPassword model (ResetPasswordMsg >> dispatch)
+    | RecoverPassword model ->
+        recoverPassword ()
     | Home model ->
         home model (HomeMsg >> dispatch)
     | Room model ->
@@ -65,7 +65,7 @@ let private footer =
 let view (model : Model) (dispatch : Msg -> unit) =          
     div [] [
         match model.Page with
-        | SignIn _ | SignUp _ | Join _ ->
+        | SignIn _ | SignUp _ | Join _ | RecoverPassword _ ->
             ignore ()
         | _ ->
             menu model.Menu.CurrentRoute
@@ -73,7 +73,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
         renderPage dispatch model.Page
 
         match model.Page with
-        | SignIn _ | SignUp _ | Join _ ->
+        | SignIn _ | SignUp _ | Join _ | RecoverPassword _ ->
             ignore ()
         | _ ->
             footer     

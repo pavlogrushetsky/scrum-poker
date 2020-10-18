@@ -10,7 +10,7 @@ type Page =
     | SignIn of SignIn.Model
     | SignUp of SignUp.Model
     | Join of Join.Model
-    | ResetPassword of ResetPassword.Model
+    | RecoverPassword of RecoverPassword.Model
     | Home of Home.Model
     | Room of Room.Model
     | About of About.Model
@@ -25,7 +25,7 @@ type Msg =
     | SignInMsg of SignIn.Msg
     | SignUpMsg of SignUp.Msg
     | JoinMsg of Join.Msg
-    | ResetPasswordMsg of ResetPassword.Msg
+    | RecoverPasswordMsg of RecoverPassword.Msg
     | HomeMsg of Home.Msg
     | RoomMsg of Room.Msg
     | AboutMsg of About.Msg

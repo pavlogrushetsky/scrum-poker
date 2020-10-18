@@ -175,7 +175,7 @@ let signIn = React.functionComponent("SignIn", fun () ->
                             ]
                             Html.a [
                                 prop.className [ Sem.ui; Sem.button; Sem.fluid ]
-                                prop.href (routeHash ResetPasswordRoute)
+                                prop.href (routeHash RecoverPasswordRoute)
                                 prop.onClick goToUrl
                                 prop.text "Forgot Password?"
                                 prop.disabled (Deferred.inProgress signInState)
