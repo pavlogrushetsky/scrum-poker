@@ -4,7 +4,6 @@ open Fable.React
 open Feliz
 
 open App.Style
-open App.Routing
 open App.Components.Menu
 open App.Model
 
@@ -19,9 +18,9 @@ open Pages.About.View
 let private renderPage dispatch page =
     match page with
     | SignIn model ->
-        signIn model (SignInMsg >> dispatch)
+        signIn ()
     | SignUp model ->
-        signUp model (SignUpMsg >> dispatch)
+        signUp ()
     | Join model ->
         join ()
     | ResetPassword model ->
