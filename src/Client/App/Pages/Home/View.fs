@@ -23,9 +23,8 @@ let private drawStatus connectionState =
     span [ ClassName (sprintf "badge badge-%s" className) ] [ str text ]
 
 let private home' = React.functionComponent("Home", fun ({ Model = model; Dispatch = dispatch }) ->
-    Html.main [
-        prop.role "main"
-        prop.className Bs.container
+    Html.div [
+        prop.className [ Sem.ui; "main"; Sem.container ]
         prop.children [
             Html.h3 [ prop.text "Send a message!" ]
             Html.div [

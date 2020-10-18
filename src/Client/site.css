@@ -1,3 +1,12 @@
 body {
-    padding-top: 4.5rem;
+    height: unset !important;
+}
+
+.main.container {
+    margin-top: 7em;
+}
+
+.ui.footer.segment {
+    margin: 5em 0em 0em;
+    padding: 2em 0em;
 }

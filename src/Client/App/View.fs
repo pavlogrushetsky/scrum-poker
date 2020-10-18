@@ -35,32 +35,54 @@ let private renderPage dispatch page =
         div [] []
 
 let private footer =
-    Html.footer [
-        prop.style [
-            style.bottom 0
-            style.width (length.percent 100)
-            style.height (length.px 60)
-            style.lineHeight (length.px 60)
-            style.backgroundColor "#fafafa"
-        ]
+    Html.div [
+        prop.className [ Sem.ui; Sem.inverted; Sem.vertical; "footer"; Sem.segment ]
         prop.children [
             Html.div [
-                prop.className Bs.container
+                prop.className [ Sem.ui; Sem.container ]           
                 prop.children [
-                    Html.p [
-                        prop.className Bs.``float-right``
+                    Html.div [
+                        prop.className [ Sem.ui; Sem.stackable; Sem.inverted; Sem.divided; "equal"; Sem.height; Sem.stackable; Sem.grid ]
                         prop.children [
-                            Html.a [
-                                prop.href "#"
-                                prop.text "Back to top"
+                            Html.div [
+                                prop.className [ Sem.three; Sem.wide; Sem.column ]
+                                prop.children [
+                                    Html.h4 [
+                                        prop.className [ Sem.ui; Sem.inverted; Sem.header ]
+                                        prop.text "About"
+                                    ]
+                                    Html.div [
+                                        prop.className [ Sem.ui; Sem.inverted; Sem.link; Sem.list ]
+                                        prop.children [
+                                            Html.a [
+                                                prop.href "#"
+                                                prop.className Sem.item
+                                                prop.text "Scrum Poker"
+                                            ]
+                                            Html.a [
+                                                prop.href "#"
+                                                prop.className Sem.item
+                                                prop.text "Github"
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                            Html.div [
+                                prop.className [ Sem.ten; Sem.wide; Sem.column ]
+                                prop.children [
+                                    Html.h4 [
+                                        prop.className [ Sem.ui; Sem.inverted; Sem.header ]
+                                        prop.text "© 2020 Pavlo Hrushetskyi"
+                                    ]
+                                ]
                             ]
                         ]
                     ]
-                    Html.p [ prop.text "© 2020 Pavlo Hrushetskyi" ]
                 ]
             ]
         ]
-    ]   
+    ]  
 
 let view (model : Model) (dispatch : Msg -> unit) =          
     div [] [
