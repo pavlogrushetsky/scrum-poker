@@ -30,38 +30,9 @@ let join = React.functionComponent("Join", fun () ->
         match joinState with
         | Deferred.HasNotStartedYet -> Html.none
         | Deferred.InProgress -> Html.none
-        | Deferred.Failed error ->
-            Html.div [
-                prop.className [ Sem.ui; Sem.attached; Sem.error; Sem.message ]
-                prop.children [
-                    Html.i [
-                        prop.className [ Sem.icon; Sem.times; Sem.circle ]
-                    ]
-                    Html.text (sprintf "Internal error: %s" error.Message)
-                ]
-            ]
-
-        | Deferred.Resolved (Ok user) ->
-            Html.div [
-                prop.className [ Sem.ui; Sem.attached; Sem.success; Sem.message ]
-                prop.children [
-                    Html.i [
-                        prop.className [ Sem.icon; Sem.check; Sem.circle ]
-                    ]
-                    Html.text (sprintf "User %s joined" user)
-                ]
-            ]
-
-        | Deferred.Resolved (Error error) ->
-            Html.div [
-                prop.className [ Sem.ui; Sem.attached; Sem.error; Sem.message ]
-                prop.children [
-                    Html.i [
-                        prop.className [ Sem.icon; Sem.user; Sem.times ]
-                    ]
-                    Html.text (sprintf "Join error: %s" error)
-                ]
-            ]
+        | Deferred.Failed error -> Html.attachedError (sprintf "Internal error: %s" error.Message)
+        | Deferred.Resolved (Ok user) -> Html.attachedSuccess (sprintf "User %s joined" user)
+        | Deferred.Resolved (Error error) -> Html.attachedError (sprintf "Join error: %s" error)
 
     Html.div [
         prop.className [ Sem.ui; Sem.form; Sem.text; Sem.container; Sem.middle; Sem.aligned ]

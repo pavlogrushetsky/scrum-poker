@@ -45,3 +45,21 @@ type Html with
             prop.className [ Fa.fab; Fa.``fa-lg``; name ]
             prop.style [ style.marginRight 3 ]
         ]
+    static member attachedMessage (text : string) style =
+        Html.div [
+            prop.className [ Sem.ui; Sem.attached; style; Sem.message ]
+            prop.children [
+                Html.i [
+                    prop.className [ Sem.icon; Sem.times; Sem.circle ]
+                ]
+                Html.text text
+            ]
+        ]
+    static member attachedError (text : string) =
+        Html.attachedMessage text Sem.error
+    static member attachedWarning (text : string) =
+        Html.attachedMessage text Sem.warning
+    static member attachedInfo (text : string) =
+        Html.attachedMessage text Sem.info
+    static member attachedSuccess (text : string) =
+        Html.attachedMessage text Sem.success
