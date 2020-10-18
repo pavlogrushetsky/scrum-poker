@@ -23,7 +23,7 @@ let private renderPage dispatch page =
     | SignUp model ->
         signUp model (SignUpMsg >> dispatch)
     | Join model ->
-        join model (JoinMsg >> dispatch)
+        join ()
     | ResetPassword model ->
         resetPassword model (ResetPasswordMsg >> dispatch)
     | Home model ->

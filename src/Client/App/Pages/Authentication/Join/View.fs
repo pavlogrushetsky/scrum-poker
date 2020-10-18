@@ -1,90 +1,139 @@
 module Pages.Join.View
 
 open Feliz
+open Feliz.UseDeferred
 
 open App.Style
 open App.Routing
-open Pages.Join
 
-let private join' = React.functionComponent("Join", fun ({ Model = model; Dispatch = dispatch }) ->
-    Html.main [
-        prop.role "main"
-        prop.className Bs.container
+let private joinRoom name room = async {
+    do! Async.Sleep 5000
+    if name = "user" && room = "room"
+    then return Ok "room"
+    else return Error "Restricted access"
+}
+
+let join = React.functionComponent("Join", fun () ->
+    let (joinState, setJoinState) = React.useState(Deferred.HasNotStartedYet)
+    let nameRef = React.useInputRef()
+    let roomRef = React.useInputRef()
+
+
+    let join () =
+        match nameRef.current, roomRef.current with
+        | Some name, Some room -> joinRoom name.value room.value
+        | _ -> failwith "Component hasn't been initialized"
+
+    let startJoin = React.useDeferredCallback(join, setJoinState)
+
+    let message =
+        match joinState with
+        | Deferred.HasNotStartedYet -> Html.none
+        | Deferred.InProgress -> Html.none
+        | Deferred.Failed error ->
+            Html.div [
+                prop.className [ Sem.ui; Sem.attached; Sem.error; Sem.message ]
+                prop.children [
+                    Html.i [
+                        prop.className [ Sem.icon; Sem.times; Sem.circle ]
+                    ]
+                    Html.text (sprintf "Internal error: %s" error.Message)
+                ]
+            ]
+
+        | Deferred.Resolved (Ok user) ->
+            Html.div [
+                prop.className [ Sem.ui; Sem.attached; Sem.success; Sem.message ]
+                prop.children [
+                    Html.i [
+                        prop.className [ Sem.icon; Sem.check; Sem.circle ]
+                    ]
+                    Html.text (sprintf "User %s joined" user)
+                ]
+            ]
+
+        | Deferred.Resolved (Error error) ->
+            Html.div [
+                prop.className [ Sem.ui; Sem.attached; Sem.error; Sem.message ]
+                prop.children [
+                    Html.i [
+                        prop.className [ Sem.icon; Sem.user; Sem.times ]
+                    ]
+                    Html.text (sprintf "Join error: %s" error)
+                ]
+            ]
+
+    Html.div [
+        prop.className [ Sem.ui; Sem.text; Sem.container; Sem.middle; Sem.aligned ]
         prop.children [
             Html.div [
-                prop.className [ Bs.row; Bs.``justify-content-center`` ]
+                prop.className [ Sem.ui; Sem.piled; Sem.segments ]
                 prop.children [
                     Html.div [
-                        prop.className [ Bs.``col-6`` ]
+                        prop.className [ Sem.ui; Sem.attached; Sem.message; ]
                         prop.children [
                             Html.div [
-                                prop.className [ Bs.card ]
+                                prop.className Sem.header
+                                prop.text "Join to Scrum Poker room!"
+                            ]
+                            Html.p [ prop.text "Fill out the form below to join an existing room by reference" ]
+                        ]
+                    ]
+                    message
+                    Html.form [
+                        prop.className [ Sem.ui; Sem.form; Sem.attached; Sem.fluid; Sem.segment ]
+                        prop.children [
+                            Html.div [
+                                prop.className Sem.field
                                 prop.children [
-                                    Html.div [
-                                        prop.className [ Bs.``card-body`` ]
-                                        prop.children [
-                                            Html.h5 [
-                                                prop.className [ Bs.``card-title``; Bs.``text-center`` ]
-                                                prop.text "Join the Room"
-                                            ]
-                                            Html.div [
-                                                prop.children [
-                                                    Html.form [
-                                                        prop.children [
-                                                            Html.div [
-                                                                prop.className Bs.``form-group``
-                                                                prop.children [
-                                                                    Html.label [
-                                                                        prop.htmlFor "nameInput"
-                                                                        prop.className Bs.``bmd-label-floating``
-                                                                        prop.text "Name"
-                                                                    ]
-                                                                    Html.input [
-                                                                        prop.type' "text"
-                                                                        prop.className Bs.``form-control``
-                                                                        prop.id "nameInput"
-                                                                    ]
-                                                                ]
-                                                            ]
-                                                            Html.div [
-                                                                prop.className Bs.``form-group``
-                                                                prop.children [
-                                                                    Html.label [
-                                                                        prop.htmlFor "referenceInput"
-                                                                        prop.className Bs.``bmd-label-floating``
-                                                                        prop.text "Room Reference"
-                                                                    ]
-                                                                    Html.input [
-                                                                        prop.type' "text"
-                                                                        prop.className Bs.``form-control``
-                                                                        prop.id "referenceInput"
-                                                                    ]
-                                                                ]
-                                                            ]
-                                                            Html.button [
-                                                                prop.className [ Bs.btn; Bs.``btn-primary``; Bs.``btn-raised``; Bs.``btn-block`` ]
-                                                                prop.text "Request Access"
-                                                            ]    
-                                                            Html.hr []   
-                                                            Html.a [
-                                                                prop.className [ Bs.btn; Bs.``btn-secondary``; Bs.``btn-block`` ]
-                                                                prop.href (routeHash SignInRoute)
-                                                                prop.onClick goToUrl
-                                                                prop.text "Back"
-                                                            ]                                                                                                                                                                                                         
-                                                        ]
-                                                    ]
-                                                ]
-                                            ]
-                                        ]
+                                    Html.label [ prop.text "Name" ]
+                                    Html.input [
+                                        prop.placeholder "Name"
+                                        prop.type' "text"
+                                        prop.ref nameRef
+                                        prop.disabled (Deferred.inProgress joinState)
                                     ]
                                 ]
                             ]
-                        ]
-                    ]
+                            Html.div [
+                                prop.className Sem.field
+                                prop.children [
+                                    Html.label [ prop.text "Room Reference" ]
+                                    Html.input [
+                                        prop.placeholder "Room Reference"
+                                        prop.type' "text"
+                                        prop.ref roomRef
+                                        prop.disabled (Deferred.inProgress joinState)
+                                    ]
+                                ]
+                            ]
+                            Html.div [
+                                prop.className [ 
+                                    Sem.ui 
+                                    Sem.blue
+                                    Sem.fluid
+                                    "submit" 
+                                    Sem.button 
+                                    if Deferred.inProgress joinState 
+                                    then Sem.loading
+                                ]
+                                prop.text "Request Access"
+                                prop.disabled (Deferred.inProgress joinState)
+                                prop.onClick(fun _ -> startJoin())
+                            ]                    
+                            Html.div [
+                                prop.className [ Sem.ui; Sem.divider ]
+                            ]
+                            Html.a [
+                                prop.className [ Sem.ui; Sem.button; Sem.fluid ]
+                                prop.href "#"
+                                prop.onClick goToUrl
+                                prop.text "Back"
+                                prop.disabled (Deferred.inProgress joinState)
+                            ]   
+                        ]        
+                    ]                        
                 ]
             ]
         ]
     ])
-
-let join model dispatch = join' { Model = model; Dispatch = dispatch }
