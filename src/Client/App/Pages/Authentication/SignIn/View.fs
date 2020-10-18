@@ -63,7 +63,7 @@ let signIn = React.functionComponent("SignIn", fun () ->
             ]
     
     Html.div [
-        prop.className [ Sem.ui; Sem.text; Sem.container; Sem.middle; Sem.aligned ]
+        prop.className [ Sem.ui; Sem.form; Sem.text; Sem.container; Sem.middle; Sem.aligned ]
         prop.children [
             Html.div [
                 prop.className [ Sem.ui; Sem.piled; Sem.segments ]
