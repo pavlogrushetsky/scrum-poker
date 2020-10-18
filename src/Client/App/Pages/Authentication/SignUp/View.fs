@@ -5,6 +5,7 @@ open Feliz.UseDeferred
 
 open App.Style
 open App.Routing
+open App.Components.FormField
 
 let private signUp' firstName lastName email password = async {
     do! Async.Sleep 5000
@@ -58,18 +59,24 @@ let signUp = React.functionComponent("Sign Up", fun () ->
                             Html.div [
                                 prop.className [ Sem.two; Sem.fields ]
                                 prop.children [
-                                    Html.div [
-                                        prop.className [ Sem.field ]
-                                        prop.children [
-                                            Html.label [ prop.text "First Name" ]
-                                            Html.input [
-                                                prop.placeholder "First Name"
-                                                prop.type' "text"
-                                                prop.ref firstNameRef
-                                                prop.disabled (Deferred.inProgress signupState)
-                                            ]
-                                        ]                    
-                                    ]
+                                    textField "First Name" firstNameRef (Deferred.inProgress signupState)
+                                    // formField'
+                                    //     { InputType = "text" 
+                                    //       Label = "First Name"
+                                    //       Placeholder = "First Name"
+                                    //       Disabled = (Deferred.inProgress signupState) } ((), firstNameRef)
+                                    // Html.div [
+                                    //     prop.className [ Sem.field ]
+                                    //     prop.children [
+                                    //         Html.label [ prop.text "First Name" ]
+                                    //         Html.input [
+                                    //             prop.placeholder "First Name"
+                                    //             prop.type' "text"
+                                    //             prop.ref firstNameRef
+                                    //             prop.disabled (Deferred.inProgress signupState)
+                                    //         ]
+                                    //     ]                    
+                                    // ]
                                     Html.div [
                                         prop.className Sem.field
                                         prop.children [

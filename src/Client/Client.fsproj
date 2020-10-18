@@ -15,6 +15,7 @@
     <Compile Include="App/Channel.fs" />
     <!-- Components -->
     <Compile Include="App/Components/Menu.fs" />
+    <Compile Include="App/Components/FormField.fs" />
     <!-- Pages -->
     <!-- Sign In -->
     <Compile Include="App/Pages/Authentication/SignIn/Model.fs" />
