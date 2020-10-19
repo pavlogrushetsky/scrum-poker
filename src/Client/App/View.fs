@@ -4,14 +4,13 @@ open Fable.React
 open Feliz
 
 open App.Style
-open App.Routing
 open App.Components.Menu
 open App.Model
 
 open Pages.SignIn.View
 open Pages.SignUp.View
 open Pages.Join.View
-open Pages.ResetPassword.View
+open Pages.RecoverPassword.View
 open Pages.Home.View
 open Pages.Room.View
 open Pages.About.View
@@ -19,13 +18,13 @@ open Pages.About.View
 let private renderPage dispatch page =
     match page with
     | SignIn model ->
-        signIn model (SignInMsg >> dispatch)
+        signIn ()
     | SignUp model ->
-        signUp model (SignUpMsg >> dispatch)
+        signUp ()
     | Join model ->
-        join model (JoinMsg >> dispatch)
-    | ResetPassword model ->
-        resetPassword model (ResetPasswordMsg >> dispatch)
+        join ()
+    | RecoverPassword model ->
+        recoverPassword ()
     | Home model ->
         home model (HomeMsg >> dispatch)
     | Room model ->
@@ -36,45 +35,67 @@ let private renderPage dispatch page =
         div [] []
 
 let private footer =
-    Html.footer [
-        prop.style [
-            style.bottom 0
-            style.width (length.percent 100)
-            style.height (length.px 60)
-            style.lineHeight (length.px 60)
-            style.backgroundColor "#fafafa"
-        ]
+    Html.div [
+        prop.className [ Sem.ui; Sem.inverted; Sem.vertical; "footer"; Sem.segment ]
         prop.children [
             Html.div [
-                prop.className Bs.container
+                prop.className [ Sem.ui; Sem.container ]           
                 prop.children [
-                    Html.p [
-                        prop.className Bs.``float-right``
+                    Html.div [
+                        prop.className [ Sem.ui; Sem.stackable; Sem.inverted; Sem.divided; "equal"; Sem.height; Sem.stackable; Sem.grid ]
                         prop.children [
-                            Html.a [
-                                prop.href "#"
-                                prop.text "Back to top"
+                            Html.div [
+                                prop.className [ Sem.three; Sem.wide; Sem.column ]
+                                prop.children [
+                                    Html.h4 [
+                                        prop.className [ Sem.ui; Sem.inverted; Sem.header ]
+                                        prop.text "About"
+                                    ]
+                                    Html.div [
+                                        prop.className [ Sem.ui; Sem.inverted; Sem.link; Sem.list ]
+                                        prop.children [
+                                            Html.a [
+                                                prop.href "#"
+                                                prop.className Sem.item
+                                                prop.text "Scrum Poker"
+                                            ]
+                                            Html.a [
+                                                prop.href "#"
+                                                prop.className Sem.item
+                                                prop.text "Github"
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                            Html.div [
+                                prop.className [ Sem.ten; Sem.wide; Sem.column ]
+                                prop.children [
+                                    Html.h4 [
+                                        prop.className [ Sem.ui; Sem.inverted; Sem.header ]
+                                        prop.text "© 2020 Pavlo Hrushetskyi"
+                                    ]
+                                ]
                             ]
                         ]
                     ]
-                    Html.p [ prop.text "© 2020 Pavlo Hrushetskyi" ]
                 ]
             ]
         ]
-    ]   
+    ]  
 
-let view (model : Model) (dispatch : Msg -> unit) =
+let view (model : Model) (dispatch : Msg -> unit) =          
     div [] [
         match model.Page with
-        | SignIn _ | SignUp _ | Join _ ->
+        | SignIn _ | SignUp _ | Join _ | RecoverPassword _ ->
             ignore ()
         | _ ->
-            menu HomeRoute
+            menu model.Menu.CurrentRoute
 
         renderPage dispatch model.Page
 
         match model.Page with
-        | SignIn _ | SignUp _ | Join _ ->
+        | SignIn _ | SignUp _ | Join _ | RecoverPassword _ ->
             ignore ()
         | _ ->
             footer     

@@ -1,4 +1,4 @@
-module Pages.Join.View
+module Pages.RecoverPassword.View
 
 open Feliz
 open Feliz.UseDeferred
@@ -6,34 +6,32 @@ open Feliz.UseDeferred
 open App.Style
 open App.Routing
 
-let private joinRoom name room = async {
+let private recoverPassword' email = async {
     do! Async.Sleep 5000
-    if name = "user" && room = "room"
-    then return Ok "room"
+    if email = "user@test.com"
+    then return Ok "user"
     else return Error "Restricted access"
 }
 
-let join = React.functionComponent("Join", fun () ->
-    let (joinState, setJoinState) = React.useState(Deferred.HasNotStartedYet)
-    let nameRef = React.useInputRef()
-    let roomRef = React.useInputRef()
+let recoverPassword = React.functionComponent("RecoverPassword", fun () ->
+    let (recoverState, setRecoverState) = React.useState(Deferred.HasNotStartedYet)
+    let emailRef = React.useInputRef()
 
-
-    let join () =
-        match nameRef.current, roomRef.current with
-        | Some name, Some room -> joinRoom name.value room.value
+    let recover () =
+        match emailRef.current with
+        | Some email -> recoverPassword' email.value
         | _ -> failwith "Component hasn't been initialized"
 
-    let startJoin = React.useDeferredCallback(join, setJoinState)
+    let startRecover = React.useDeferredCallback(recover, setRecoverState)
 
     let message =
-        match joinState with
+        match recoverState with
         | Deferred.HasNotStartedYet -> Html.none
         | Deferred.InProgress -> Html.none
         | Deferred.Failed error -> Html.attachedError (sprintf "Internal error: %s" error.Message)
-        | Deferred.Resolved (Ok user) -> Html.attachedSuccess (sprintf "User %s joined" user)
-        | Deferred.Resolved (Error error) -> Html.attachedError (sprintf "Join error: %s" error)
-
+        | Deferred.Resolved (Ok user) -> Html.attachedSuccess "Recovery letter sent"
+        | Deferred.Resolved (Error error) -> Html.attachedError (sprintf "Recover error: %s" error)
+    
     Html.div [
         prop.className [ Sem.ui; Sem.form; Sem.text; Sem.container; Sem.middle; Sem.aligned ]
         prop.children [
@@ -45,9 +43,9 @@ let join = React.functionComponent("Join", fun () ->
                         prop.children [
                             Html.div [
                                 prop.className Sem.header
-                                prop.text "Join to Scrum Poker room!"
+                                prop.text "Recover access to Scrum Poker!"
                             ]
-                            Html.p [ prop.text "Fill out the form below to join an existing room by reference" ]
+                            Html.p [ prop.text "Specify your Email address to get a recovery letter" ]
                         ]
                     ]
                     message
@@ -57,24 +55,12 @@ let join = React.functionComponent("Join", fun () ->
                             Html.div [
                                 prop.className Sem.field
                                 prop.children [
-                                    Html.label [ prop.text "Name" ]
+                                    Html.label [ prop.text "Email Address" ]
                                     Html.input [
-                                        prop.placeholder "Name"
-                                        prop.type' "text"
-                                        prop.ref nameRef
-                                        prop.disabled (Deferred.inProgress joinState)
-                                    ]
-                                ]
-                            ]
-                            Html.div [
-                                prop.className Sem.field
-                                prop.children [
-                                    Html.label [ prop.text "Room Reference" ]
-                                    Html.input [
-                                        prop.placeholder "Room Reference"
-                                        prop.type' "text"
-                                        prop.ref roomRef
-                                        prop.disabled (Deferred.inProgress joinState)
+                                        prop.placeholder "Email Address"
+                                        prop.type' "email"
+                                        prop.ref emailRef
+                                        prop.disabled (Deferred.inProgress recoverState)
                                     ]
                                 ]
                             ]
@@ -85,12 +71,12 @@ let join = React.functionComponent("Join", fun () ->
                                     Sem.fluid
                                     "submit" 
                                     Sem.button 
-                                    if Deferred.inProgress joinState 
+                                    if Deferred.inProgress recoverState 
                                     then Sem.loading
                                 ]
-                                prop.text "Request Access"
-                                prop.disabled (Deferred.inProgress joinState)
-                                prop.onClick(fun _ -> startJoin())
+                                prop.text "Send Email"
+                                prop.disabled (Deferred.inProgress recoverState)
+                                prop.onClick(fun _ -> startRecover())
                             ]                    
                             Html.div [
                                 prop.className [ Sem.ui; Sem.divider ]
@@ -100,7 +86,7 @@ let join = React.functionComponent("Join", fun () ->
                                 prop.href "#"
                                 prop.onClick goToUrl
                                 prop.text "Back"
-                                prop.disabled (Deferred.inProgress joinState)
+                                prop.disabled (Deferred.inProgress recoverState)
                             ]   
                         ]        
                     ]                        

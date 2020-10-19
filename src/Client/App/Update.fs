@@ -31,10 +31,10 @@ let updateRoute (route : PageRoute option) (model : Model) =
         let model', cmd = Join.Update.init()
         let menu = { model.Menu with CurrentRoute = JoinRoute }
         { model with Page = Join model'; Menu = menu }, Cmd.map JoinMsg cmd
-    | Some ResetPasswordRoute ->
-        let model', cmd = ResetPassword.Update.init()
-        let menu = { model.Menu with CurrentRoute = ResetPasswordRoute }
-        { model with Page = ResetPassword model'; Menu = menu }, Cmd.map ResetPasswordMsg cmd
+    | Some RecoverPasswordRoute ->
+        let model', cmd = RecoverPassword.Update.init()
+        let menu = { model.Menu with CurrentRoute = RecoverPasswordRoute }
+        { model with Page = RecoverPassword model'; Menu = menu }, Cmd.map RecoverPasswordMsg cmd
     | Some HomeRoute ->
         let model', cmd = Home.Update.init model.ConnectionState
         let menu = { model.Menu with CurrentRoute = HomeRoute }
@@ -110,8 +110,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         model |> updatePage (SignUp.Update.update msg m) SignUp SignUpMsg 
     | JoinMsg msg, Join m ->
         model |> updatePage (Join.Update.update msg m) Join JoinMsg 
-    | ResetPasswordMsg msg, ResetPassword m ->
-        model |> updatePage (ResetPassword.Update.update msg m) ResetPassword ResetPasswordMsg 
+    | RecoverPasswordMsg msg, RecoverPassword m ->
+        model |> updatePage (RecoverPassword.Update.update msg m) RecoverPassword RecoverPasswordMsg 
     | HomeMsg msg, Home m ->
         model |> updatePage (Home.Update.update msg m) Home HomeMsg        
     | RoomMsg msg, Room m ->
@@ -137,7 +137,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         model, Cmd.none
     | JoinMsg _, _ ->
         model, Cmd.none
-    | ResetPasswordMsg _, _ ->
+    | RecoverPasswordMsg _, _ ->
         model, Cmd.none
     | HomeMsg _, _ ->
         model, Cmd.none

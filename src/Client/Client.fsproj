@@ -15,7 +15,7 @@
     <Compile Include="App/Channel.fs" />
     <!-- Components -->
     <Compile Include="App/Components/Menu.fs" />
-    <Compile Include="App/Components/SignUpForm.fs" />
+    <Compile Include="App/Components/FormField.fs" />
     <!-- Pages -->
     <!-- Sign In -->
     <Compile Include="App/Pages/Authentication/SignIn/Model.fs" />
@@ -29,10 +29,10 @@
     <Compile Include="App/Pages/Authentication/Join/Model.fs" />
     <Compile Include="App/Pages/Authentication/Join/View.fs" />
     <Compile Include="App/Pages/Authentication/Join/Update.fs" />
-    <!-- Reset Password -->
-    <Compile Include="App/Pages/Authentication/ResetPassword/Model.fs" />
-    <Compile Include="App/Pages/Authentication/ResetPassword/View.fs" />
-    <Compile Include="App/Pages/Authentication/ResetPassword/Update.fs" />
+    <!-- Recover Password -->
+    <Compile Include="App/Pages/Authentication/RecoverPassword/Model.fs" />
+    <Compile Include="App/Pages/Authentication/RecoverPassword/View.fs" />
+    <Compile Include="App/Pages/Authentication/RecoverPassword/Update.fs" />
     <!-- Home -->
     <Compile Include="App/Pages/Home/Model.fs" />
     <Compile Include="App/Pages/Home/View.fs" />
