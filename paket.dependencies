@@ -6,6 +6,7 @@ nuget Fable.Browser.WebSocket
 nuget Fable.Remoting.Giraffe
 nuget Feliz
 nuget Feliz.UseDeferred
+nuget Feliz.UseElmish
 nuget LiteDB.FSharp
 nuget Saturn
 nuget Expecto

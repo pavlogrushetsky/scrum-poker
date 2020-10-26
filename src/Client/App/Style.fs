@@ -63,3 +63,17 @@ type Html with
         Html.attachedMessage text Sem.info
     static member attachedSuccess (text : string) =
         Html.attachedMessage text Sem.success
+    static member divider (text : string) =
+        let withText = not (System.String.IsNullOrEmpty(text))
+        Html.div [
+            prop.className [ 
+                Sem.ui 
+                if withText
+                then Sem.horizontal
+                Sem.divider 
+            ]
+            if withText
+            then prop.text text
+        ]
+    static member divider () =
+        Html.divider ""

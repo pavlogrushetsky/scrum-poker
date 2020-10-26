@@ -24,7 +24,7 @@ let updateRoute (route : PageRoute option) (model : Model) =
         let menu = { model.Menu with CurrentRoute = SignInRoute }
         { model with Page = SignIn model'; Menu = menu }, Cmd.map SignInMsg cmd
     | Some SignUpRoute ->
-        let model', cmd = SignUp.Update.init()
+        let model', cmd = SignUp.View.init()
         let menu = { model.Menu with CurrentRoute = SignUpRoute }
         { model with Page = SignUp model'; Menu = menu }, Cmd.map SignUpMsg cmd
     | Some JoinRoute ->
@@ -107,7 +107,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     | SignInMsg msg, SignIn m ->
         model |> updatePage (SignIn.Update.update msg m) SignIn SignInMsg 
     | SignUpMsg msg, SignUp m ->
-        model |> updatePage (SignUp.Update.update msg m) SignUp SignUpMsg 
+        model |> updatePage (SignUp.View.update msg m) SignUp SignUpMsg 
     | JoinMsg msg, Join m ->
         model |> updatePage (Join.Update.update msg m) Join JoinMsg 
     | RecoverPasswordMsg msg, RecoverPassword m ->

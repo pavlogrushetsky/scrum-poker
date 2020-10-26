@@ -8,7 +8,7 @@ open App.Components.Menu
 
 type Page =
     | SignIn of SignIn.Model
-    | SignUp of SignUp.Model
+    | SignUp of SignUp.View.SignUpPageModel
     | Join of Join.Model
     | RecoverPassword of RecoverPassword.Model
     | Home of Home.Model
@@ -23,7 +23,7 @@ type Model =
 
 type Msg =
     | SignInMsg of SignIn.Msg
-    | SignUpMsg of SignUp.Msg
+    | SignUpMsg of SignUp.View.SignUpPageMsg
     | JoinMsg of Join.Msg
     | RecoverPasswordMsg of RecoverPassword.Msg
     | HomeMsg of Home.Msg
